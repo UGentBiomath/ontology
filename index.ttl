@@ -220,9 +220,9 @@ housecase1:e_mbr_kwh_per_m3 a owl:DatatypeProperty ;
     rdfs:domain      housecase1:Household ;
     rdfs:range       xsd:decimal .
 
-housecase1:roof_level_fraction a owl:DatatypeProperty ;
-    rdfs:label       "Roof infiltration fraction" ;
-    rdfs:comment     "Relative roof‐runoff reference level (unitless)" ;
+housecase1:lvl_of_PW a owl:DatatypeProperty ;
+    rdfs:label       "Level of PW" ;
+    rdfs:comment     "Minimum Level of PW (unitless)" ;
     rdfs:domain      housecase1:Household ;
     rdfs:range       xsd:decimal .
 
@@ -308,8 +308,8 @@ housecase1:max_refill_rate a owl:DatatypeProperty ;
     rdfs:domain      housecase1:Household ;
     rdfs:range       xsd:decimal .
 
-housecase1:purge_fraction a owl:DatatypeProperty ;
-    rdfs:label       "Purge fraction (unitless)" ;
+housecase1:purge a owl:DatatypeProperty ;
+    rdfs:label       "Purge  (m³/d)" ;
     rdfs:domain      housecase1:Household ;
     rdfs:range       xsd:decimal .
 

@@ -15,4 +15,4 @@ energysource:WasteWaterCollection a owl:Class .
 energysource:WasteWaterTreatment a owl: Class .
 energysource:RecycledWasteWaterTreatment a owl: Class .
 energysource: RecycledWaterDistribution a owl:Class .
-energysource: WasteWaterDischarge a owl : Class .
+energysource: WasteWaterDischarge a owl : Class ;

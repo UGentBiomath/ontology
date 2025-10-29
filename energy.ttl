@@ -7,12 +7,12 @@
 @prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-# ------- Classes ------
+# --------------Classes -----------------------------------------
 energysource:WaterConveyance a owl:Class . # Water Conveyance 
-energysource:WaterTreatment a owl: Class . # Water Treatment
-energysource:WaterDistribution a owl: Class . # Water Distribution
+energysource:WaterTreatment a owl:Class . # Water Treatment
+energysource:WaterDistribution a owl:Class . # Water Distribution
 energysource:WasteWaterCollection a owl:Class . # Waste Water Collection
-energysource:WasteWaterTreatment a owl: Class . # Waste Water Treatment
-energysource:RecycledWasteWaterTreatment a owl: Class . # Recycled Waste Water Treatment
-energysource: RecycledWaterDistribution a owl:Class . # Recycled Water Distribution
-energysource: WasteWaterDischarge a owl : Class ; # Waste Water Discharge
+energysource:WasteWaterTreatment a owl:Class . # Waste Water Treatment
+energysource:RecycledWasteWaterTreatment a owl:Class . # Recycled Waste Water Treatment
+energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distribution
+energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge

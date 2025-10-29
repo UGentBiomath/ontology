@@ -7,14 +7,14 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 # --------------Classes -----------------------------------------
-energysource:WaterConveyance a owl:Class . # Water Conveyance 
-energysource:WaterTreatment a owl:Class . # Water Treatment
-energysource:WaterDistribution a owl:Class . # Water Distribution
-energysource:WasteWaterCollection a owl:Class . # Waste Water Collection
-energysource:WasteWaterTreatment a owl:Class . # Waste Water Treatment
-energysource:RecycledWasteWaterTreatment a owl:Class . # Recycled Waste Water Treatment
-energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distribution
-energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge
+energysource:WaterConveyance a owl:Class . # Water Conveyance as an energy source
+energysource:WaterTreatment a owl:Class . # Water Treatment as an energy source
+energysource:WaterDistribution a owl:Class . # Water Distribution as an energy source
+energysource:WasteWaterCollection a owl:Class . # Waste Water Collection as an energy source
+energysource:WasteWaterTreatment a owl:Class . # Waste Water Treatment as an energy source
+energysource:RecycledWasteWaterTreatment a owl:Class . # Recycled Waste Water Treatment as an energy source
+energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distribution as an energy source
+energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge as an energy source
 
 energysource:GroundWaterPumping a owl:class ;
 rdfs:subclassof energysource:Waterconveyance ;
@@ -63,3 +63,21 @@ rdfs:label " Tertiary waste water treatment with trickling filter " .
 energysource:TertiarywithActivatedSludge a owl:class ;
 rdfs:subclassof energysource:WasteWaterTreatment ;
 rdfs:label " Tertiary waste water treatment with activated sludge " .
+
+#--------------------------Properties-------------------------
+
+energysource:hassourcedischargelocation a owl:objectproperty ;
+rdfs:domain energysource:GroundWaterPumping ;
+rdfs:range energysource:hassourcedischargelocation ;
+rdfs:label "has source discharge location " .
+
+energysource:hasflowresistance a owl:objectproperty ;
+rdfs:domain energysource:GroundWaterPumping ;
+rdfs:range energysource:hasflowresistance ;
+rdfs:label "has flow resistance " .
+
+
+
+
+
+

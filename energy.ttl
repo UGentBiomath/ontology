@@ -44,8 +44,8 @@ energysource:MSFandMEDandMVC a owl:class ;
 rdfs:subclassof energysource:WaterTreatment ;
 rdfs:label " MSF,MED and MVC Desalination (Water Treatment)" .
 
-energysource:DistributionPumping a owl class ;
-rdfs:subclass of energysource:WaterDistribution ;
+energysource:DistributionPumping a owl:class ;
+rdfs:subclassof energysource:WaterDistribution ;
 rdfs:label " Distribution Pumping (Water Distribution)" .
 
 energysource:Secondary a owl:class ;
@@ -63,7 +63,3 @@ rdfs:label " Tertiary waste water treatment with trickling filter " .
 energysource:TertiarywithActivatedSludge a owl:class ;
 rdfs:subclassof energysource:WasteWaterTreatment ;
 rdfs:label " Tertiary waste water treatment with activated sludge " .
-
-#------------------ Properties----------------------------------
-
-

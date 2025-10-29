@@ -17,37 +17,53 @@ energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distributi
 energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge
 
 energysource:GroundWaterPumping a owl:class ;
-rdfs:subclassof energysource:Waterconveyance .
+rdfs:subclassof energysource:Waterconveyance ;
+rdfs:label "Ground Water Pumping (Water Coveyance)" .
 
 energysource:SurfaceWaterPumping a owl:class ;
-rdfs:subclassof energysource:Waterconveyance .
+rdfs:subclassof energysource:Waterconveyance ;
+rdfs:label "Surface Water Pumping (Water Conveyance)" .
 
 energysource:PrimaryPumping a owl:class ;
-rdfs:subclassof energysource:WaterTreatment .
+rdfs:subclassof energysource:WaterTreatment ;
+rdfs:label "Primary Pumping (Water Treatment)" .
 
 energysource:SecondaryPumping a owl:class ;
-rdfs:subclassof energysource:WaterTreatment .
+rdfs:subclassof energysource:WaterTreatment ;
+rdfs:label "Secondary Pumping (Water Treatment)" .
 
 energysource:RO a owl:class;
-rdfs:subclassof energysource:WaterTreatment .
+rdfs:subclassof energysource:WaterTreatment ;
+rdfs:label "  RO (Water Treatment)" .
 
 energysource:SWDesal a owl:class ;
-rdfs:subclassof energysource:WaterTreatment .
+rdfs:subclassof energysource:WaterTreatment ;
+rdfs:label " Sea Water Desalination (Water Treatment) " .
 
 energysource:MSFandMEDandMVC a owl:class ;
-rdfs:subclassof energysource:WaterTreatment .
+rdfs:subclassof energysource:WaterTreatment ;
+rdfs:label " MSF,MED and MVC Desalination (Water Treatment)" .
 
 energysource:DistributionPumping a owl class ;
-rdfs:subclass of energysource:WaterDistribution .
+rdfs:subclass of energysource:WaterDistribution ;
+rdfs:label " Distribution Pumping (Water Distribution)" .
 
 energysource:Secondary a owl:class ;
-rdfs:subclassof energysource:WasteWaterTreatment .
+rdfs:subclassof energysource:WasteWaterTreatment ;
+rdfs:label " Secondary waste water treatment" .
 
 energysource:SecondarywithNitrification a owl:class ;
-rdfs:subclassof energysource:WasteWaterTreatment .
+rdfs:subclassof energysource:WasteWaterTreatment ;
+rdfs:label " Secondary waste water treatment with Nitrification" .
 
 energysource:TertiarywithTricklingFilter a owl:class ;
-rdfs:subclassof energysource:WasteWaterTreatment .
+rdfs:subclassof energysource:WasteWaterTreatment ;
+rdfs:label " Tertiary waste water treatment with trickling filter " .
 
 energysource:TertiarywithActivatedSludge a owl:class ;
-rdfs:subclassof energysource:WasteWaterTreatment .
+rdfs:subclassof energysource:WasteWaterTreatment ;
+rdfs:label " Tertiary waste water treatment with activated sludge " .
+
+#------------------ Properties----------------------------------
+
+

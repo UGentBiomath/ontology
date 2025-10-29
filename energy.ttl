@@ -76,6 +76,28 @@ rdfs:domain energysource:GroundWaterPumping ;
 rdfs:range energysource:hasflowresistance ;
 rdfs:label "has flow resistance " .
 
+energysource:GroundWaterPumping rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty energysource:hasLiftDistance ;
+    owl:someValuesFrom xsd:decimal
+],
+[
+    a owl:Restriction ;
+    owl:onProperty energysource:hasFlowVolume ;
+    owl:someValuesFrom xsd:decimal
+],
+[
+    a owl:Restriction ;
+    owl:onProperty energysource:hasPressureRequirement ;
+    owl:someValuesFrom xsd:decimal
+],
+[
+    a owl:Restriction ;
+    owl:onProperty energysource:hasTime ;
+    owl:someValuesFrom xsd:decimal
+] .
+
+
 
 
 

@@ -15,3 +15,24 @@ energysource:WasteWaterTreatment a owl:Class . # Waste Water Treatment
 energysource:RecycledWasteWaterTreatment a owl:Class . # Recycled Waste Water Treatment
 energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distribution
 energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge
+
+energysource:GroundWaterPumping a owl:class ;
+rdfs:subclassof energysource:Waterconveyance .
+
+energysource:SurfaceWaterPumping a owl:class ;
+rdfs:subclassof energysource:Waterconveyance ;
+
+energysource:PrimaryPumping a owl:class ;
+rdfs:subclassof energysource:WaterTreatment .
+
+energysource:SecondaryPumping a owl:class ;
+rdfs:subclassof energysource:WaterTreatment .
+
+energysource:RO a owl:class;
+rdfs:subclassof energysource:WaterTreatment .
+
+energysource:SWDesal a owl:class ;
+rdfs:subclassof energysource:WaterTreatment .
+
+energysource:MSF/MED/MVC a owl:class ;
+rdfs:subclassof energysource:WaterTreatment .

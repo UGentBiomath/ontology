@@ -8,7 +8,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 # ------- Classes ------
-energysource:WaterConveyance a owl:Class . #Water Conveyance 
+energysource:WaterConveyance a owl:Class . # Water Conveyance 
 energysource:WaterTreatment a owl: Class . # Water Treatment
 energysource:WaterDistribution a owl: Class . # Water Distribution
 energysource:WasteWaterCollection a owl:Class . # Waste Water Collection

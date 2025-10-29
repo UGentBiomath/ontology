@@ -20,7 +20,7 @@ energysource:GroundWaterPumping a owl:class ;
 rdfs:subclassof energysource:Waterconveyance .
 
 energysource:SurfaceWaterPumping a owl:class ;
-rdfs:subclassof energysource:Waterconveyance ;
+rdfs:subclassof energysource:Waterconveyance .
 
 energysource:PrimaryPumping a owl:class ;
 rdfs:subclassof energysource:WaterTreatment .
@@ -34,5 +34,20 @@ rdfs:subclassof energysource:WaterTreatment .
 energysource:SWDesal a owl:class ;
 rdfs:subclassof energysource:WaterTreatment .
 
-energysource:MSF/MED/MVC a owl:class ;
+energysource:MSFandMEDandMVC a owl:class ;
 rdfs:subclassof energysource:WaterTreatment .
+
+energysource:DistributionPumping a owl class ;
+rdfs:subclass of energysource:WaterDistribution .
+
+energysource:Secondary a owl:class ;
+rdfs:subclassof energysource:WasteWaterTreatment .
+
+energysource:SecondarywithNitrification a owl:class ;
+rdfs:subclassof energysource:WasteWaterTreatment .
+
+energysource:TertiarywithTricklingFilter a owl:class ;
+rdfs:subclassof energysource:WasteWaterTreatment .
+
+energysource:TertiarywithActivatedSludge a owl:class ;
+rdfs:subclassof energysource:WasteWaterTreatment .

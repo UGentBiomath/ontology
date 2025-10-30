@@ -5,6 +5,10 @@
 @prefix time: <http://www.w3.org/2006/time#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantity: <http://qudt.org/vocab/quantitykind/> .
+
 
 # --------------Classes -----------------------------------------
 energysource:WaterConveyance a owl:Class . # Water Conveyance as an energy source
@@ -18,7 +22,7 @@ energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge as an ene
 
 energysource:GroundWaterPumping a owl:class ;
 rdfs:subclassof energysource:Waterconveyance ;
-rdfs:label "Ground Water Pumping (Water Coveyance)" .
+rdfs:label "Ground Water Pumping (Water Conveyance)" .
 
 energysource:SurfaceWaterPumping a owl:class ;
 rdfs:subclassof energysource:Waterconveyance ;
@@ -66,6 +70,8 @@ rdfs:label " Tertiary waste water treatment with activated sludge " .
 
 #--------------------------Properties-------------------------
 
+#--------Sub Properties of Ground Water Pumping---------------
+
 energysource:hassourcedischargelocation a owl:objectproperty ;
 rdfs:domain energysource:GroundWaterPumping ;
 rdfs:range energysource:hassourcedischargelocation ;
@@ -79,23 +85,25 @@ rdfs:label "has flow resistance " .
 energysource:GroundWaterPumping rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasLiftDistance ;
-    owl:someValuesFrom xsd:decimal
+    owl:someValuesFrom xsd:float
 ],
 [
     a owl:Restriction ;
     owl:onProperty energysource:hasFlowVolume ;
-    owl:someValuesFrom xsd:decimal
+    owl:someValuesFrom xsd:float
 ],
 [
     a owl:Restriction ;
     owl:onProperty energysource:hasPressureRequirement ;
-    owl:someValuesFrom xsd:decimal
+    owl:someValuesFrom xsd:float
 ],
 [
     a owl:Restriction ;
     owl:onProperty energysource:hasTime ;
-    owl:someValuesFrom xsd:decimal
+    owl:someValuesFrom xsd:float
 ] .
+
+energysource:Groundwaterpumping a owl:class ;
 
 
 

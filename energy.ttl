@@ -11,14 +11,45 @@
 
 
 # --------------Classes -----------------------------------------
-energysource:WaterConveyance a owl:Class . # Water Conveyance as an energy source
-energysource:WaterTreatment a owl:Class . # Water Treatment as an energy source
-energysource:WaterDistribution a owl:Class . # Water Distribution as an energy source
-energysource:WasteWaterCollection a owl:Class . # Waste Water Collection as an energy source
-energysource:WasteWaterTreatment a owl:Class . # Waste Water Treatment as an energy source
-energysource:RecycledWasteWaterTreatment a owl:Class . # Recycled Waste Water Treatment as an energy source
-energysource:RecycledWaterDistribution a owl:Class . # Recycled Water Distribution as an energy source
-energysource:WasteWaterDischarge a owl:Class . # Waste Water Discharge as an energy source
+energysource:EnergySourceProcess a owl class ;
+rdfs:label "Energy Source Process " .
+
+energysource:hasEnergyConsumption a owl:ObjectProperty ;
+rdfs:domain energysource:EnergySourceProcess ;
+rdfs:range qudt:QuantityValue ;
+rdfs:label "has energy consumption" .
+
+energysource:WaterConveyance a owl:Class;
+rdfs:subclass of energysource:EnergySourceProcess;
+rdfs:label "Water Conveyance".
+
+energysource:WaterTreatment a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProcess;
+rdfs:label " Water Treatment".
+
+energysource:WaterDistribution a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProcess;
+rdfs:label " Water Distribution".
+
+energysource:WasteWaterCollection a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProcess;
+rdfs:label " Water Distribution".
+
+energysource:WasteWaterTreatment a owl:Class ;
+rdfs:subclass of energysource:EnergysourceProcess;
+rdfs:label " Waste Water Treatment".
+
+energysource:RecycledWasteWaterTreatment a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProceess;
+rdfs:label "Recycled Waste Water Treatment" .
+
+energysource:RecycledWaterDistribution a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProceess;
+rdfs:label "Recycled Water Distribution" .
+
+energysource:WasteWaterDischarge a owl:Class ;
+rdfs:subclass of energysource:EnergySourceProceess;
+rdfs:label "Waste Water Discharge" .
 
 energysource:GroundWaterPumping a owl:class ;
 rdfs:subclassof energysource:Waterconveyance ;
@@ -103,7 +134,7 @@ energysource:GroundWaterPumping rdfs:subClassOf [
     owl:someValuesFrom xsd:float
 ] .
 
-energysource:Groundwaterpumping a owl:class ;
+
 
 
 

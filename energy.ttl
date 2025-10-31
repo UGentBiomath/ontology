@@ -134,21 +134,5 @@ energysource:GroundWaterPumping rdfs:subClassOf [
     owl:someValuesFrom xsd:float
 ] .
 
-energysource:GroundWaterPumping
-    rdfs:subClassOf [
-        a owl:Restriction ;
-        owl:onProperty energysource:hasEnergyConsumption ;
-        owl:someValuesFrom [
-            a rdfs:Datatype ;
-            owl:onDatatype xsd:float ;
-            owl:withRestrictions (
-                [ xsd:minInclusive "0.14"^^xsd:float ]
-                [ xsd:maxInclusive "0.69"^^xsd:float ]
-            )
-        ]
-    ] .
-
-
-
 
 

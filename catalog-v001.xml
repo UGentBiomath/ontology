@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="https://openenergyplatform.org/ontology/oeo/releases/2.9.0/oeo.owl" uri="file:/C:/Study%20Files/Internship%20University%20of%20Ghent/Master%20Thesis/Ontology%20Model/OEO(Energy%20and%20AI)/oeo-full.owl"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base=""/>
+</catalog>

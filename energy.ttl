@@ -29,8 +29,8 @@ rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label " Waste Water Collection".
 
 energysource:WasteWaterConveyance a owl:Class ;
-rdfs:subClassOf energysource:EnergysourceProcess;
-rdfs:label " Waste Water Treatment".
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Waste Water Conveyance".
 
 energysource:RecycledWasteWaterConveyance a owl:Class ;
 rdfs:subClassOf energysource:EnergySourceProceess;
@@ -65,7 +65,7 @@ rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label " RO (Water Treatment)" .
 
 energysource:SeaWaterRO a owl:Class;
-rdfs:subclassOf energysource:RO ;
+rdfs:subClassOf energysource:RO ;
 rdfs:label " Sea Water RO (Water Treatment)".
 
 energysource:BrackishRO a owl:Class;
@@ -138,7 +138,7 @@ rdfs:label "Secondary Pumping (Water Treatment)" .
 
 energysource:RO a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "  RO (Water Treatment)" .
+rdfs:label " RO (Water Treatment)" .
 
 energysource:SeaWaterRO a owl:Class ;
 rdfs:subclassOf energysource:RO ;
@@ -256,30 +256,26 @@ rdfs:label "Activated Sludge" .
 energysource:hasEnergyConsumption a owl:ObjectProperty ;
 rdfs:domain energysource:EnergySourceProcess ;
 rdfs:range qudt:QuantityValue ;
-rdfs:label "Energy consumption" .
+rdfs:label "has Energy Consumption of " .
 
 energysource:hasElectricalEnergy a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "Electrical Energy" .
+    rdfs:label "has Electrical Energy of " .
 
 energysource:hasThermalEnergy a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "Thermal Energy" .
+    rdfs:label "has Thermal Energy of" .
 
 #energysource:hassourcedischargelocation a owl:ObjectProperty ;
 #rdfs:domain energysource:GroundWaterPumping ;
 #rdfs:range energysource:hassourcedischargelocation ;
 #rdfs:label "has source discharge location " .
 
-energysource:Pipeline a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Pipeline" .
-
-#---------Restrictions---------------------
+#---------Data Properties---------------------
 energysource:GroundWaterPumping rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasLiftDistance ;

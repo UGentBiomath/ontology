@@ -33,15 +33,15 @@ rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label " Waste Water Conveyance".
 
 energysource:RecycledWasteWaterConveyance a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
+rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Recycled Waste Water Treatment" .
 
 energysource:RecycledWaterDistribution a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
+rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Recycled Water Distribution" .
 
 energysource:WasteWaterDischarge a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
+rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Waste Water Discharge" .
 
 energysource:GroundWaterPumping a owl:Class ;
@@ -51,6 +51,14 @@ rdfs:label "Ground Water Pumping (Water Conveyance)" .
 energysource:SurfaceWaterPumping a owl:Class ;
 rdfs:subClassOf energysource:Waterconveyance ;
 rdfs:label "Surface Water Pumping (Water Conveyance)" .
+
+energysource:SurfaceWaterPumping_Normal a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Normal Surface Water Pumping (Water Conveyance)" .
+
+energysource:SurfaceWaterPumping_Gravity a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Gravity driven Surface Water Pumping (Water Conveyance)" .
 
 energysource:PrimaryPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterConveyance ;
@@ -275,69 +283,114 @@ energysource:hasThermalEnergy a owl:ObjectProperty ;
 #rdfs:range energysource:hassourcedischargelocation ;
 #rdfs:label "has source discharge location " .
 
-#---------Data Properties---------------------
-energysource:GroundWaterPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasLiftDistance ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasFlowVolume ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasPressureRequirement ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasTime ;
-    owl:someValuesFrom xsd:float
-] .
+#-----------Properties with Quantity Values-------------------
+# Variables
+energysource:LiftDistance a qudt:QuantityValue ;
+    rdfs:label "Lift distance" ;
+    qudt:unit unit:Meter .
 
-energysource:SurfaceWaterPumping_Normal rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasLengthofPipeline ;
-    owl:someValuesFrom xsd:float
-],
-[ a owl:Restriction ;
-owl:onProperty energysource:hasCrossSectionArea ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasHazenWilliamsCoefficient ;
-owl:someValuesFrom xsd:float ],
-[a owl:Restriction ;
-owl:onProperty energysource:hasSlope ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasAge ;
-owl:someValuesFrom xsd:float] .
+energysource:FlowVolume a qudt:QuantityValue ;
+    rdfs:label "Flow volume" ;
+    qudt:unit unit:CubicMeterPerSecond .
 
-energysource:SurfaceWaterPumping_Gravity rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasChannelLength ;
-    owl:someValuesFrom xsd:float
-],
-[ a owl:Restriction ;
-owl:onProperty energysource:hasConstantSpecifictoMaterial ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasSoilPermeability ;
-owl:someValuesFrom xsd:float ],
-[a owl:Restriction ;
-owl:onProperty energysource:hasBedSlope ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasFrictonalandVegetativeResistance ;
-owl:someValuesFrom xsd:float] ,
-[a owl:Restriction ;
-owl:onProperty energysource:hasEvapoTranspirationRate ;
-owl:someValuesFrom xsd:float] ,
-[a owl:Restriction ;
-owl:onProperty energysource:hasPrecipitationRate ;
-owl:someValuesFrom xsd:float] .
+energysource:PressureRequirement a qudt:QuantityValue ;
+    rdfs:label "Pressure requirement" ;
+    qudt:unit unit:Bar .
+
+energysource:Time a qudt:QuantityValue ;
+    rdfs:label "Time" ;
+    qudt:unit unit:Hour .
+
+# Link variables to the class
+energysource:GroundWaterPumping energysource:hasVariable energysource:LiftDistance .
+energysource:GroundWaterPumping energysource:hasVariable energysource:FlowVolume .
+energysource:GroundWaterPumping energysource:hasVariable energysource:PressureRequirement .
+energysource:GroundWaterPumping energysource:hasVariable energysource:Time .
+
+# Variables
+energysource:LiftDistance a qudt:QuantityValue ;
+    rdfs:label "Lift distance" ;
+    qudt:unit unit:Meter .
+
+energysource:FlowVolume a qudt:QuantityValue ;
+    rdfs:label "Flow volume" ;
+    qudt:unit unit:CubicMeterPerSecond .
+
+energysource:PressureRequirement a qudt:QuantityValue ;
+    rdfs:label "Pressure requirement" ;
+    qudt:unit unit:Bar .
+
+energysource:Time a qudt:QuantityValue ;
+    rdfs:label "Time" ;
+    qudt:unit unit:Hour .
+
+# Link variables to the class
+energysource:GroundWaterPumping energysource:hasVariable energysource:LiftDistance .
+energysource:GroundWaterPumping energysource:hasVariable energysource:FlowVolume .
+energysource:GroundWaterPumping energysource:hasVariable energysource:PressureRequirement .
+energysource:GroundWaterPumping energysource:hasVariable energysource:Time .
+
+energysource:LengthOfPipeline a qudt:QuantityValue ;
+    rdfs:label "Length of pipeline" ;
+    qudt:unit unit:Meter .
+
+energysource:CrossSectionArea a qudt:QuantityValue ;
+    rdfs:label "Cross-sectional area" ;
+    qudt:unit unit:SquareMeter .
+
+energysource:HazenWilliamsCoefficient a qudt:QuantityValue ;
+    rdfs:label "Hazen-Williams coefficient" .  # unitless
+
+energysource:Slope a qudt:QuantityValue ;
+    rdfs:label "Slope" ;
+    qudt:unit unit:Percent .
+
+energysource:Age a qudt:QuantityValue ;
+    rdfs:label "Age" ;
+    qudt:unit unit:Year .
+
+# Link variables to SurfaceWaterPumping_Normal
+energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:LengthOfPipeline .
+energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:CrossSectionArea .
+energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:HazenWilliamsCoefficient .
+energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:Slope .
+energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:Age .
+
+
+energysource:ChannelLength a qudt:QuantityValue ;
+    rdfs:label "Channel length" ;
+    qudt:unit unit:Meter .
+
+energysource:ConstantSpecificToMaterial a qudt:QuantityValue ;
+    rdfs:label "Unitless" . # unitless
+
+energysource:SoilPermeability a qudt:QuantityValue ;
+    rdfs:label "Soil permeability" ;
+    qudt:unit unit:MillimeterPerHour .
+
+energysource:BedSlope a qudt:QuantityValue ;
+    rdfs:label "Bed slope" ;
+    qudt:unit unit:Percent .
+
+energysource:FrictionalAndVegetativeResistance a qudt:QuantityValue ;
+    rdfs:label "Unitless" . # unitless
+
+energysource:EvapoTranspirationRate a qudt:QuantityValue ;
+    rdfs:label "Evapotranspiration rate" ;
+    qudt:unit unit:MillimeterPerDay .
+
+energysource:PrecipitationRate a qudt:QuantityValue ;
+    rdfs:label "Precipitation rate" ;
+    qudt:unit unit:MillimeterPerDay .
+
+# Link variables to SurfaceWaterPumping_Gravity
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:ChannelLength .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:ConstantSpecificToMaterial .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:SoilPermeability .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:BedSlope .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:FrictionalAndVegetativeResistance .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:EvapoTranspirationRate .
+energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:PrecipitationRate .
 
 #---------Quantity Value--------------------------
 energysource:WellPumping energysource:hasEnergyConsumption [
@@ -345,6 +398,7 @@ energysource:WellPumping energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:BoosterPumping energysource:hasEnergyConsumption [
@@ -352,6 +406,7 @@ energysource:BoosterPumping energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Chlorination energysource:hasEnergyConsumption [
@@ -359,6 +414,7 @@ energysource:Chlorination energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
    
 energysource:Pipeline energysource:hasEnergyConsumption [
@@ -366,6 +422,7 @@ energysource:Pipeline energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Canal energysource:hasEnergyConsumption [
@@ -373,6 +430,7 @@ energysource:Canal energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Tanker energysource:hasEnergyConsumption [
@@ -380,6 +438,7 @@ energysource:Tanker energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:WaterBag energysource:hasEnergyConsumption [
@@ -387,6 +446,7 @@ energysource:Tanker energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+   rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:SurfaceWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
@@ -394,6 +454,7 @@ energysource:SurfaceWaterChlorinationandDechlorination energysource:hasEnergyCon
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+   rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:GroundWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
@@ -401,6 +462,7 @@ energysource:GroundWaterChlorinationandDechlorination energysource:hasEnergyCons
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:UVIrradiation energysource:hasEnergyConsumption [
@@ -408,6 +470,7 @@ energysource:UVIrradiation energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:Ozone energysource:hasEnergyConsumption [
@@ -415,6 +478,7 @@ energysource:UVIrradiation energysource:hasEnergyConsumption [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:HydraCAP60 energysource:hasEnergyConsumption [
@@ -422,6 +486,7 @@ energysource:HydraCAP60 energysource:hasEnergyConsumption [
      qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Microfiltration energysource:hasEnergyConsumption [
@@ -429,6 +494,7 @@ energysource:Microfiltration energysource:hasEnergyConsumption [
      qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:MSF energysource:hasElectricalEnergy [
@@ -436,12 +502,14 @@ energysource:MSF energysource:hasElectricalEnergy [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:MSF energysource:hasThermalEnergy [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:MED energysource:hasElectricalEnergy [
@@ -449,48 +517,56 @@ energysource:MSF energysource:hasElectricalEnergy [
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:MED energysource:hasThermalEnergy [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:SeaWaterRO energysource:hasElectricalEnergy [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 energysource:BrackishRO energysource:hasThermalEnergy [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:Lagoons energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:ActivatedSludge energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:OxidationDitch energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 energysource:MembraneBio_Reactors energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
    qudt:lowerBound "0.0"^^xsd:float ;
     qudt:upperBound "0.0"^^xsd:float ;
     qudt:unit unit:KiloWattHourPerCubicMeter
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
 

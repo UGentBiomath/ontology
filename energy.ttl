@@ -1,15 +1,12 @@
 @prefix energysource:<https://ugentbiomath.github.io/ontology/energy.ttl#> .
-@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix time: <http://www.w3.org/2006/time#> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix qudt: <http://qudt.org/schema/qudt/> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
 @prefix quantity: <http://qudt.org/vocab/quantitykind/> .
-@prefix ieso: <https://www.gecad.isep.ipp.pt/ieso/v1.1.0/> .
 
 
 # --------------Classes -----------------------------------------

@@ -304,29 +304,6 @@ energysource:GroundWaterPumping energysource:hasVariable energysource:FlowVolume
 energysource:GroundWaterPumping energysource:hasVariable energysource:PressureRequirement .
 energysource:GroundWaterPumping energysource:hasVariable energysource:Time .
 
-# Variables
-energysource:LiftDistance a qudt:QuantityValue ;
-    rdfs:label "Lift distance" ;
-    qudt:unit unit:Meter .
-
-energysource:FlowVolume a qudt:QuantityValue ;
-    rdfs:label "Flow volume" ;
-    qudt:unit unit:CubicMeterPerSecond .
-
-energysource:PressureRequirement a qudt:QuantityValue ;
-    rdfs:label "Pressure requirement" ;
-    qudt:unit unit:Bar .
-
-energysource:Time a qudt:QuantityValue ;
-    rdfs:label "Time" ;
-    qudt:unit unit:Hour .
-
-# Link variables to the class
-energysource:GroundWaterPumping energysource:hasVariable energysource:LiftDistance .
-energysource:GroundWaterPumping energysource:hasVariable energysource:FlowVolume .
-energysource:GroundWaterPumping energysource:hasVariable energysource:PressureRequirement .
-energysource:GroundWaterPumping energysource:hasVariable energysource:Time .
-
 energysource:LengthOfPipeline a qudt:QuantityValue ;
     rdfs:label "Length of pipeline" ;
     qudt:unit unit:Meter .

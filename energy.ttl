@@ -263,17 +263,19 @@ rdfs:domain energysource:EnergySourceProcess ;
 rdfs:range qudt:QuantityValue ;
 rdfs:label "has Energy Consumption of " .
 
-energysource:hasElectricalEnergy a owl:ObjectProperty ;
+energysource:hasElectricalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
     rdfs:label "has Electrical Energy of " .
 
-energysource:hasThermalEnergy a owl:ObjectProperty ;
+energysource:hasThermalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
     rdfs:label "has Thermal Energy of" .
+
+ 
 
 #energysource:hassourcedischargelocation a owl:ObjectProperty ;
 #rdfs:domain energysource:GroundWaterPumping ;
@@ -369,179 +371,134 @@ energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:P
 #---------Quantity Value--------------------------
 energysource:WellPumping energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:BoosterPumping energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Chlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
    
 energysource:Pipeline energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Canal energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Tanker energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
     rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:WaterBag energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:SurfaceWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:GroundWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:UVIrradiation energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:Ozone energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:HydraCAP60 energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-     qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Microfiltration energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-     qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
-energysource:MSF energysource:hasElectricalEnergy [
+energysource:MSF energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MSF energysource:hasThermalEnergy [
+    energysource:MSF energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
-    energysource:MED energysource:hasElectricalEnergy [
+    energysource:MED energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MED energysource:hasThermalEnergy [
+    energysource:MED energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:SeaWaterRO energysource:hasElectricalEnergy [
+    energysource:SeaWaterRO energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-energysource:BrackishRO energysource:hasThermalEnergy [
+energysource:BrackishRO energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:Lagoons energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:ActivatedSludge energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:OxidationDitch energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 energysource:MembraneBio_Reactors energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
+
 
 
 

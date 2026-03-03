@@ -93,10 +93,6 @@ energysource:HydraulicSurfaceWashing a owl:Class ;
 rdfs:subClassOf energysource:PrimaryTreatment ;
 rdfs:label "Hydraulic Surface Washing" .
 
-energysource:SecondaryTreatment a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Secondary Treatment (Water Treatment)" .
-
 energysource:RO a owl:Class;
 rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label " RO (Water Treatment)" .
@@ -444,7 +440,7 @@ energysource:MSF energysource:hasElectricalEnergyConsumption [
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MSF energysource:hasThermalEnergyConsumption [
+    energysource:MVC energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
@@ -455,11 +451,7 @@ energysource:MSF energysource:hasElectricalEnergyConsumption [
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MED energysource:hasThermalEnergyConsumption [
-    a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter;
- rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
-].
+
     energysource:SeaWaterRO energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter;
@@ -491,8 +483,41 @@ energysource:MembraneBio_Reactors energysource:hasEnergyConsumption [
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
+energysource:CoagulantFeeding energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
 
+energysource:RapidMixing energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
 
+energysource:Flocculation energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Sedimentation energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:GravityFiltration energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:HydraulicSurfaceWashing energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
 
 
 

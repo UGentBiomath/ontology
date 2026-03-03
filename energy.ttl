@@ -42,11 +42,11 @@ rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Waste Water Discharge" .
 
 energysource:GroundWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Ground Water Pumping (Water Conveyance)" .
 
 energysource:SurfaceWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Surface Water Pumping (Water Conveyance)" .
 
 energysource:SurfaceWaterPumping_Normal a owl:Class;
@@ -126,11 +126,11 @@ rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Waste Water Discharge" .
 
 energysource:GroundWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Ground Water Pumping (Water Conveyance)" .
 
 energysource:SurfaceWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Surface Water Pumping (Water Conveyance)" .
 
 energysource:PrimaryPumping a owl:Class ;
@@ -213,7 +213,7 @@ energysource:WaterBag a owl:Class ;
 rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Water Bag" .
 
-energysource:SurafceWaterChlorinationandDechlorination a owl:Class ;
+energysource:SurfaceWaterChlorinationandDechlorination a owl:Class ;
 rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Surface Water Chlorination and Dechlorination" .
 
@@ -250,7 +250,7 @@ rdfs:subClassOf energysource:Secondary ;
 rdfs:label "Oxidation Ditch" .
 
 energysource:MembraneBio_Reactors a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:Secondary;
 rdfs:label "Membrane Bio Reactors" . 
 
 energysource:Trickling a owl:Class ;

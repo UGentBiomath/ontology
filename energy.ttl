@@ -127,7 +127,7 @@ rdfs:label " Secondary waste water treatment" .
 
 energysource:TertiaryTreatment a owl:Class ;
 rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label " Tertiary waste water treatment with trickling filter " .
+rdfs:label " Tertiary waste water treatment" .
 
 energysource:GroundWaterPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterConveyance ;
@@ -254,8 +254,6 @@ energysource:hasThermalEnergyConsumption a owl:ObjectProperty ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
     rdfs:label "has Thermal Energy of" .
-
- 
 
 #energysource:hassourcedischargelocation a owl:ObjectProperty ;
 #rdfs:domain energysource:GroundWaterPumping ;

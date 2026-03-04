@@ -121,19 +121,11 @@ energysource:DistributionPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterDistribution ;
 rdfs:label " Distribution Pumping (Water Distribution)" .
 
-energysource:Secondary a owl:Class ;
+energysource:SecondaryTreatment a owl:Class ;
 rdfs:subClassOf energysource:WasteWaterTreatment ;
 rdfs:label " Secondary waste water treatment" .
 
-energysource:SecondarywithNitrification a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label " Secondary waste water treatment with Nitrification" .
-
-energysource:TertiarywithTricklingFilter a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label " Tertiary waste water treatment with trickling filter " .
-
-energysource:TertiarywithActivatedSludge a owl:Class ;
+energysource:TertiaryTreatment a owl:Class ;
 rdfs:subClassOf energysource:WasteWaterTreatment ;
 rdfs:label " Tertiary waste water treatment with trickling filter " .
 
@@ -146,11 +138,11 @@ rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Surface Water Pumping (Water Conveyance)" .
 
 energysource:PrimaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Primary Pumping (Water Treatment)" .
 
 energysource:SecondaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Secondary Pumping (Water Treatment)" .
 
 energysource:RO a owl:Class ;
@@ -202,47 +194,47 @@ rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Water Bag" .
 
 energysource:SurfaceWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:SecondaryTreatment ;
+rdfs:subClassOf energysource:PrimaryTreatment ;
 rdfs:label "Surface Water Chlorination and Dechlorination" .
 
 energysource:GroundWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:SecondaryTreatment ;
+rdfs:subClassOf energysource:PrimaryTreatment ;
 rdfs:label "Ground Water Chlorination and Dechlorination" .
 
 energysource:UVIrradiation a owl:Class ;
-rdfs:subClassOf energysource:Tertiary;
+rdfs:subClassOf energysource:TertiaryTreatment;
 rdfs:label "UV Irradiation" .
 
 energysource:Ozone a owl:Class ;
-rdfs:subClassOf energysource:Tertiary ;
+rdfs:subClassOf energysource:TertiaryTreatment ;
 rdfs:label "Ozone" .
 
 energysource:HydraCAP60 a owl:Class ;
-rdfs:subClassOf energysource:Tertiary ;
+rdfs:subClassOf energysource:TertiaryTreatment ;
 rdfs:label "HydraCAP 60" .
 
 energysource:Microfiltration a owl:Class ;
-rdfs:subClassOf energysource:Tertiary;
+rdfs:subClassOf energysource:TertiaryTreatment;
 rdfs:label "Microfiltration" .
 
 energysource:Lagoons a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:SecondaryTreatment ;
 rdfs:label "Lagoons" .
 
 energysource:ActivatedSludge a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:SecondaryTreatment ;
 rdfs:label "Activated Sludge" .
 
 energysource:OxidationDitch a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:SecondaryTreatment ;
 rdfs:label "Oxidation Ditch" .
 
 energysource:MembraneBio_Reactors a owl:Class ;
-rdfs:subClassOf energysource:Secondary;
+rdfs:subClassOf energysource:SecondaryTreatment;
 rdfs:label "Membrane Bio Reactors" . 
 
 energysource:Trickling a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:SecondaryTreatment ;
 rdfs:label "Trickling" .
 
 #--------Properties ---------------

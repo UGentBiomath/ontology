@@ -1,24 +1,26 @@
 @prefix energysource:<https://ugentbiomath.github.io/ontology/energy.ttl#> .
-@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix time: <http://www.w3.org/2006/time#> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix qudt: <http://qudt.org/schema/qudt/> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
 @prefix quantity: <http://qudt.org/vocab/quantitykind/> .
-@prefix ieso: <https://www.gecad.isep.ipp.pt/ieso/v1.1.0/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 
 
-# --------------Classes -----------------------------------------
+# --------------SuperClass -----------------------------------------
 energysource:EnergySourceProcess a owl:Class ;
 rdfs:label "Energy Source Process " .
-#----------------Sub Classes --------------------------------
+#----------------Classes --------------------------------
 energysource:WaterConveyance a owl:Class;
 rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Water Conveyance".
+
+energysource:WaterTreatment a owl:Class;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label "Water Treatment".
 
 energysource:WaterDistribution a owl:Class ;
 rdfs:subClassOf energysource:EnergySourceProcess;
@@ -28,37 +30,65 @@ energysource:WasteWaterCollection a owl:Class ;
 rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label " Waste Water Collection".
 
-energysource:WasteWaterConveyance a owl:Class ;
+energysource:WasteWaterTreatment a owl:Class ;
 rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Waste Water Conveyance".
+rdfs:label " Waste Water Treatment".
 
-energysource:RecycledWasteWaterConveyance a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
+energysource:WasteWaterDischarge a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Waste Water Discharge".
+
+energysource:RecycledWasteWaterTreatment a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Recycled Waste Water Treatment" .
 
 energysource:RecycledWaterDistribution a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
+rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Recycled Water Distribution" .
 
-energysource:WasteWaterDischarge a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProceess;
-rdfs:label "Waste Water Discharge" .
-
 energysource:GroundWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Ground Water Pumping (Water Conveyance)" .
 
 energysource:SurfaceWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
+rdfs:subClassOf energysource:WaterConveyance ;
 rdfs:label "Surface Water Pumping (Water Conveyance)" .
 
-energysource:PrimaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Primary Pumping (Water Treatment)" .
+energysource:SurfaceWaterPumping_Normal a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Normal Surface Water Pumping (Water Conveyance)" .
 
-energysource:SecondaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Secondary Pumping (Water Treatment)" .
+energysource:SurfaceWaterPumping_Gravity a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Gravity driven Surface Water Pumping (Water Conveyance)" .
+
+energysource:Chlorination a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Chlorination" .
+
+energysource:CoagulantFeeding a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Coagulant Feeding" .
+
+energysource:RapidMixing a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Rapid Mixing" .
+
+energysource:Flocculation a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Flocculation" .
+
+energysource:Sedimentation a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Sedimentation" .
+
+energysource:GravityFiltration a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Gravity Filtration" .
+
+energysource:HydraulicSurfaceWashing a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Hydraulic Surface Washing" .
 
 energysource:RO a owl:Class;
 rdfs:subClassOf energysource:WaterTreatment ;
@@ -84,101 +114,21 @@ energysource:MVC a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label " MVC Desalination (Water Treatment)" .
 
-energysource:DistributionPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterDistribution ;
-rdfs:label " Distribution Pumping (Water Distribution)" .
-
-energysource:Secondary a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Secondary waste water treatment" .
-
-energysource:SecondarywithNitrification a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Secondary waste water treatment with Nitrification" .
-
-energysource:TertiarywithTricklingFilter a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Tertiary waste water treatment with trickling filter " .
-
-energysource:TertiarywithActivatedSludge a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Tertiary waste water treatment with trickling filter " .
-
-energysource:WasteWaterConveyance a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Waste Water Treatment".
-
-energysource:RecycledWasteWaterConveyance a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Recycled Waste Water Treatment" .
-
-energysource:RecycledWaterDistribution a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Recycled Water Distribution" .
-
-energysource:WasteWaterDischarge a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Waste Water Discharge" .
-
-energysource:GroundWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
-rdfs:label "Ground Water Pumping (Water Conveyance)" .
-
-energysource:SurfaceWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:Waterconveyance ;
-rdfs:label "Surface Water Pumping (Water Conveyance)" .
-
-energysource:PrimaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Primary Pumping (Water Treatment)" .
-
-energysource:SecondaryPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Secondary Pumping (Water Treatment)" .
-
-energysource:RO a owl:Class ;
+energysource:BackWashPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " RO (Water Treatment)" .
+rdfs:label "Back Wash Pumping" .
 
-energysource:SeaWaterRO a owl:Class ;
-rdfs:subclassOf energysource:RO ;
-rdfs:label " Sea Water RO (Water Treatment)".
-
-energysource:BrackishRO a owl:Class ;
-rdfs:subClassOf energysource:RO ;
-rdfs:label "Brackish RO (Water Treatment)".
-
-energysource:MSF a owl:Class ;
+energysource:InPlantPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MSF Desalination (Water Treatment)" .
+rdfs:label "In-Plant Pumping" .
 
-energysource:MED a owl:Class ;
+energysource:ChlorineFeeding a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MED Desalination (Water Treatment)" .
+rdfs:label "Chlorine Feeding" .
 
-energysource:MVC a owl:Class ;
+energysource:HighServicePumping a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MVC Desalination (Water Treatment)" .
-
-energysource:DistributionPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterDistribution ;
-rdfs:label " Distribution Pumping (Water Distribution)" .
-
-energysource:Secondary a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Secondary waste water treatment" .
-
-energysource:SecondarywithNitrification a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Secondary waste water treatment with Nitrification" .
-
-energysource:TertiarywithTricklingFilter a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Tertiary waste water treatment with trickling filter " .
-
-energysource:TertiarywithActivatedSludge a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterConveyance ;
-rdfs:label " Tertiary waste water treatment with activated sludge " .
+rdfs:label "High Service Pumping" .
 
 energysource:WellPumping a owl:Class ;
 rdfs:subClassOf energysource:GroundWaterPumping ;
@@ -188,310 +138,511 @@ energysource:BoosterPumping a owl:Class ;
 rdfs:subClassOf energysource:GroundWaterPumping ;
 rdfs:label "Booster Pumping" .
 
-energysource:Chlorination a owl:Class ;
-rdfs:subClassOf energysource:GroundWaterPumping ;
-rdfs:label "Chlorination" .
-
-energysource:Pipeline a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Pipeline" .
-
-energysource:Canal a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Canal" .
-
-energysource:Tanker a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Tanker" .
-
-energysource:WaterBag a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Water Bag" .
-
-energysource:SurafceWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+energysource:SurfaceWaterChlorinationandDechlorination a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Surface Water Chlorination and Dechlorination" .
 
 energysource:GroundWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Ground Water Chlorination and Dechlorination" .
 
 energysource:UVIrradiation a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance;
+rdfs:subClassOf energysource:WaterTreatment;
 rdfs:label "UV Irradiation" .
 
 energysource:Ozone a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Ozone" .
 
 energysource:HydraCAP60 a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "HydraCAP 60" .
 
 energysource:Microfiltration a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance;
+rdfs:subClassOf energysource:WaterTreatment;
 rdfs:label "Microfiltration" .
 
 energysource:Lagoons a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
 rdfs:label "Lagoons" .
 
 energysource:ActivatedSludge a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
 rdfs:label "Activated Sludge" .
 
 energysource:OxidationDitch a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
 rdfs:label "Oxidation Ditch" .
 
 energysource:MembraneBio_Reactors a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
+rdfs:subClassOf energysource:WasteWaterTreatment;
 rdfs:label "Membrane Bio Reactors" . 
 
 energysource:Trickling a owl:Class ;
-rdfs:subClassOf energysource:Secondary ;
-rdfs:label "Activated Sludge" .
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Trickling" .
 
-#--------Properties ---------------
+energysource:AdvancedWaterTreatment a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Advanced Water Treatment" .
+
+energysource:WasteWaterPumping a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label " Tertiary waste water treatment" .
+
+energysource:AeratedGritRemoval a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "AeratedGritRemoval" .
+
+energysource:PrimaryClarifiers a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Primary Clarifiers" .
+
+energysource:Aeration a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Aeration" .
+
+energysource:ReturnSludgePumping a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Return Sludge Pumping" .
+
+energysource:SecondaryClarifiers a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Secondary Clarifiers" .
+
+energysource:Digestion a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Digestion" .
+
+energysource:Dewatering a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Dewatering" .
+
+energysource:ChemicalAddition a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Chemical Addition" .
+
+energysource:FilterFeedPumping a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Filter Feed Pumping" .
+
+energysource:Filtration a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Filtration" .
+
+energysource:BiologicalNitrification a owl:Class ;
+rdfs:subClassOf energysource:WasteWaterTreatment ;
+rdfs:label "Biological Nitrification" .
+
+energysource:DistributionPumping a owl:Class ;
+rdfs:subClassOf energysource:WaterDistribution ;
+rdfs:label " Distribution Pumping Water Distribution" .
+
+#-----------------Properties ---------------
+# This is a template for an Energy Reading. It has no value, only a unit.
 energysource:hasEnergyConsumption a owl:ObjectProperty ;
 rdfs:domain energysource:EnergySourceProcess ;
 rdfs:range qudt:QuantityValue ;
-rdfs:label "has Energy Consumption of " .
+rdfs:label "has Energy Consumption" .
+    
 
-energysource:hasElectricalEnergy a owl:ObjectProperty ;
+energysource:hasElectricalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Electrical Energy of " .
+    rdfs:label "has Electrical Energy Consumption" .
 
-energysource:hasThermalEnergy a owl:ObjectProperty ;
+energysource:hasThermalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Thermal Energy of" .
+    rdfs:label "has Thermal Energy Consumption" .
 
-#energysource:hassourcedischargelocation a owl:ObjectProperty ;
-#rdfs:domain energysource:GroundWaterPumping ;
-#rdfs:range energysource:hassourcedischargelocation ;
-#rdfs:label "has source discharge location " .
+#-----------Properties of Variables-------------------
+# Variables
+energysource:hasVariable a owl:ObjectProperty ;
+    rdfs:domain energysource:EnergySourceProcess ;
+    rdfs:range qudt:QuantityValue .
 
-#---------Data Properties---------------------
-energysource:GroundWaterPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasLiftDistance ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasFlowVolume ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasPressureRequirement ;
-    owl:someValuesFrom xsd:float
-],
-[
-    a owl:Restriction ;
-    owl:onProperty energysource:hasTime ;
-    owl:someValuesFrom xsd:float
-] .
+energysource:hasLiftDistance a owl:ObjectProperty;
+rdfs:subPropertyOf energysource:hasVariable.
 
-energysource:SurfaceWaterPumping_Normal rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasLengthofPipeline ;
-    owl:someValuesFrom xsd:float
-],
-[ a owl:Restriction ;
-owl:onProperty energysource:hasCrossSectionArea ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasHazenWilliamsCoefficient ;
-owl:someValuesFrom xsd:float ],
-[a owl:Restriction ;
-owl:onProperty energysource:hasSlope ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasAge ;
-owl:someValuesFrom xsd:float] .
+energysource:hasFlowVolume a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:SurfaceWaterPumping_Gravity rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasChannelLength ;
-    owl:someValuesFrom xsd:float
-],
-[ a owl:Restriction ;
-owl:onProperty energysource:hasConstantSpecifictoMaterial ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasSoilPermeability ;
-owl:someValuesFrom xsd:float ],
-[a owl:Restriction ;
-owl:onProperty energysource:hasBedSlope ;
-owl:someValuesFrom xsd:float],
-[a owl:Restriction ;
-owl:onProperty energysource:hasFrictonalandVegetativeResistance ;
-owl:someValuesFrom xsd:float] ,
-[a owl:Restriction ;
-owl:onProperty energysource:hasEvapoTranspirationRate ;
-owl:someValuesFrom xsd:float] ,
-[a owl:Restriction ;
-owl:onProperty energysource:hasPrecipitationRate ;
-owl:someValuesFrom xsd:float] .
+energysource:hasPressureRequirement a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasTime a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasLengthOfPipeline a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasCrossSectionArea a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasHazenWilliamsCoefficient a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasSlope a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasAge a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasChannelLength a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasConstantSpecificToMaterial a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasSoilPermeability a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasBedSlope a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasFrictionalandVegetativeResistance a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasEvapotranspirationRate a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
+energysource:hasPrecipitationRate a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
+
 
 #---------Quantity Value--------------------------
-energysource:WellPumping energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
-] .
-
 energysource:BoosterPumping energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Chlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
    
-energysource:Pipeline energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
-] .
-
-energysource:Canal energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
-] .
-
-energysource:Tanker energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
-].
-
-    energysource:WaterBag energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
-] .
-
 energysource:SurfaceWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+   rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:GroundWaterChlorinationandDechlorination energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:UVIrradiation energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
     energysource:Ozone energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:HydraCAP60 energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-     qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
 energysource:Microfiltration energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-     qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ] .
 
-energysource:MSF energysource:hasElectricalEnergy [
+energysource:MSF energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MSF energysource:hasThermalEnergy [
+    energysource:MVC energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 
-    energysource:MED energysource:hasElectricalEnergy [
+    energysource:MED energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:MED energysource:hasThermalEnergy [
+
+    energysource:SeaWaterRO energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:SeaWaterRO energysource:hasElectricalEnergy [
+
+    energysource:BrackishRO energysource:hasElectricalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-energysource:BrackishRO energysource:hasThermalEnergy [
+
+energysource:BrackishRO energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:Lagoons energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
-    energysource:ActivatedSludge energysource:hasEnergyConsumption [
+    energysource:WasteWaterTreatment energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
     energysource:OxidationDitch energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
 energysource:MembraneBio_Reactors energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
-   qudt:lowerBound "0.0"^^xsd:float ;
-    qudt:upperBound "0.0"^^xsd:float ;
-    qudt:unit unit:KiloWattHourPerCubicMeter
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
+
+energysource:CoagulantFeeding energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:RapidMixing energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Flocculation energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Sedimentation energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:GravityFiltration energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:HydraulicSurfaceWashing energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:BackWashPumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:InPlantPumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:ChlorineFeeding energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:HighServicePumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:WellPumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:WasteWaterPumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:AeratedGritRemoval energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:PrimaryClarifiers energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Aeration energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:ReturnSludgePumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:SecondaryClarifiers energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Digestion energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Dewatering energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:ChemicalAddition energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:FilterFeedPumping energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:Filtration energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
+energysource:BiologicalNitrification energysource:hasEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+#----------------------Restrictions-----------------------------------
+energysource:GroundWaterPumping
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasLiftDistance ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Flow Volume
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasFlowVolume ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Pressure Requirement
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasPressureRequirement ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Time variable
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasTime ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
+
+    energysource:SurfaceWaterPumping_Normal
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasLengthOfPipeline ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasCrossSectionArea ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasHazenWilliamsCoefficient ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasSlope ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasAge ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
+
+    energysource:SurfaceWaterPumping_Gravity
+ rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasChannelLength ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasConstantSpecificToMaterial ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasSoilPermeability ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasBedSlope ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasFrictionalandVegetativeResistance ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+      rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasEvapotranspirationRate ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasPrecipitationRate ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
 
 
 

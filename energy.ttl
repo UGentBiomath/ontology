@@ -7,12 +7,13 @@
 @prefix qudt: <http://qudt.org/schema/qudt/> .
 @prefix unit: <http://qudt.org/vocab/unit/> .
 @prefix quantity: <http://qudt.org/vocab/quantitykind/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 
 
-# --------------Classes -----------------------------------------
+# --------------SuperClass -----------------------------------------
 energysource:EnergySourceProcess a owl:Class ;
 rdfs:label "Energy Source Process " .
-#----------------Sub Classes --------------------------------
+#----------------Classes --------------------------------
 energysource:WaterConveyance a owl:Class;
 rdfs:subClassOf energysource:EnergySourceProcess;
 rdfs:label "Water Conveyance".
@@ -237,121 +238,82 @@ energysource:DistributionPumping a owl:Class ;
 rdfs:subClassOf energysource:WaterDistribution ;
 rdfs:label " Distribution Pumping Water Distribution" .
 
-#--------Properties ---------------
+#-----------------Properties ---------------
+# This is a template for an Energy Reading. It has no value, only a unit.
 energysource:hasEnergyConsumption a owl:ObjectProperty ;
 rdfs:domain energysource:EnergySourceProcess ;
 rdfs:range qudt:QuantityValue ;
-rdfs:label "has Energy Consumption of " .
+rdfs:label "has Energy Consumption" .
+    
 
 energysource:hasElectricalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Electrical Energy of " .
+    rdfs:label "has Electrical Energy Consumption" .
 
 energysource:hasThermalEnergyConsumption a owl:ObjectProperty ;
     rdfs:subPropertyOf energysource:hasEnergyConsumption ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Thermal Energy of" .
+    rdfs:label "has Thermal Energy Consumption" .
 
-#-----------Properties with Quantity Values-------------------
+#-----------Properties of Variables-------------------
 # Variables
 energysource:hasVariable a owl:ObjectProperty ;
     rdfs:domain energysource:EnergySourceProcess ;
     rdfs:range qudt:QuantityValue .
 
-energysource:LiftDistance a qudt:QuantityValue ;
-    rdfs:label "Lift distance" ;
-    qudt:unit unit:Meter .
+energysource:hasLiftDistance a owl:ObjectProperty;
+rdfs:subPropertyOf energysource:hasVariable.
 
-energysource:FlowVolume a qudt:QuantityValue ;
-    rdfs:label "Flow volume" ;
-    qudt:unit unit:CubicMeterPerSecond .
+energysource:hasFlowVolume a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:PressureRequirement a qudt:QuantityValue ;
-    rdfs:label "Pressure requirement" ;
-    qudt:unit unit:Bar .
+energysource:hasPressureRequirement a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:Time a qudt:QuantityValue ;
-    rdfs:label "Time" ;
-    qudt:unit unit:Hour .
+energysource:hasTime a owl:ObjectProperty ; 
+rdfs:subPropertyOf energysource:hasVariable .
 
-# Link variables to the class
-energysource:GroundWaterPumping energysource:hasVariable energysource:LiftDistance .
-energysource:GroundWaterPumping energysource:hasVariable energysource:FlowVolume .
-energysource:GroundWaterPumping energysource:hasVariable energysource:PressureRequirement .
-energysource:GroundWaterPumping energysource:hasVariable energysource:Time .
+energysource:hasLengthOfPipeline a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:LengthOfPipeline a qudt:QuantityValue ;
-    rdfs:label "Length of pipeline" ;
-    qudt:unit unit:Meter .
+energysource:hasCrossSectionArea a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:CrossSectionArea a qudt:QuantityValue ;
-    rdfs:label "Cross-sectional area" ;
-    qudt:unit unit:SquareMeter .
+energysource:hasHazenWilliamsCoefficient a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:HazenWilliamsCoefficient a qudt:QuantityValue ;
-    rdfs:label "Hazen-Williams coefficient" .  # unitless
+energysource:hasSlope a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:Slope a qudt:QuantityValue ;
-    rdfs:label "Slope" ;
-    qudt:unit unit:Percent .
+energysource:hasAge a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:Age a qudt:QuantityValue ;
-    rdfs:label "Age" ;
-    qudt:unit unit:Year .
+energysource:hasChannelLength a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-# Link variables to SurfaceWaterPumping_Normal
-energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:LengthOfPipeline .
-energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:CrossSectionArea .
-energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:HazenWilliamsCoefficient .
-energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:Slope .
-energysource:SurfaceWaterPumping_Normal energysource:hasVariable energysource:Age .
+energysource:hasConstantSpecificToMaterial a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
+energysource:hasSoilPermeability a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:ChannelLength a qudt:QuantityValue ;
-    rdfs:label "Channel length" ;
-    qudt:unit unit:Meter .
+energysource:hasBedSlope a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:ConstantSpecificToMaterial a qudt:QuantityValue ;
-    rdfs:label "Unitless" . 
+energysource:hasFrictionalandVegetativeResistance a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:SoilPermeability a qudt:QuantityValue ;
-    rdfs:label "Soil permeability" ;
-    qudt:unit unit:MillimeterPerHour .
+energysource:hasEvapotranspirationRate a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:BedSlope a qudt:QuantityValue ;
-    rdfs:label "Bed slope" ;
-    qudt:unit unit:Percent .
+energysource:hasPrecipitationRate a owl:ObjectProperty ;
+rdfs:subPropertyOf energysource:hasVariable .
 
-energysource:FrictionalAndVegetativeResistance a qudt:QuantityValue ;
-    rdfs:label "Unitless" . 
-
-energysource:EvapoTranspirationRate a qudt:QuantityValue ;
-    rdfs:label "Evapotranspiration rate" ;
-    qudt:unit unit:MillimeterPerDay .
-
-energysource:PrecipitationRate a qudt:QuantityValue ;
-    rdfs:label "Precipitation rate" ;
-    qudt:unit unit:MillimeterPerDay .
-
-# Link variables to SurfaceWaterPumping_Gravity
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:ChannelLength .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:ConstantSpecificToMaterial .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:SoilPermeability .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:BedSlope .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:FrictionalAndVegetativeResistance .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:EvapoTranspirationRate .
-energysource:SurfaceWaterPumping_Gravity energysource:hasVariable energysource:PrecipitationRate .
 
 #---------Quantity Value--------------------------
-energysource:WellPumping energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter;
-    rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
-] .
-
 energysource:BoosterPumping energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter;
@@ -422,6 +384,13 @@ energysource:MSF energysource:hasElectricalEnergyConsumption [
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
+
+    energysource:BrackishRO energysource:hasElectricalEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter;
+ rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
+].
+
 energysource:BrackishRO energysource:hasThermalEnergyConsumption [
     a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter;
@@ -479,18 +448,6 @@ energysource:GravityFiltration energysource:hasEnergyConsumption [
 ].
 
 energysource:HydraulicSurfaceWashing energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter;
- rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
-].
-
-energysource:PrimaryPumping energysource:hasEnergyConsumption [
-    a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter;
- rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
-].
-
-energysource:SecondaryPumping energysource:hasEnergyConsumption [
     a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
@@ -597,6 +554,96 @@ energysource:BiologicalNitrification energysource:hasEnergyConsumption [
     qudt:unit unit:KiloWattHourPerCubicMeter;
  rdfs:comment "Placeholder bounds; actual energy consumption range to be defined later"
 ].
+#----------------------Restrictions-----------------------------------
+energysource:GroundWaterPumping
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasLiftDistance ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Flow Volume
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasFlowVolume ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Pressure Requirement
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasPressureRequirement ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    # RESTRICTION: Must have at least one Time variable
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasTime ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
+
+    energysource:SurfaceWaterPumping_Normal
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasLengthOfPipeline ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasCrossSectionArea ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasHazenWilliamsCoefficient ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasSlope ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasAge ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
+
+    energysource:SurfaceWaterPumping_Gravity
+ rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasChannelLength ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasConstantSpecificToMaterial ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasSoilPermeability ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasBedSlope ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+     rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasFrictionalandVegetativeResistance ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+      rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasEvapotranspirationRate ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] ;
+    rdfs:subClassOf [ 
+        a owl:Restriction ; 
+        owl:onProperty energysource:hasPrecipitationRate ; 
+        owl:someValuesFrom qudt:QuantityValue 
+    ] .
+
 
 
 

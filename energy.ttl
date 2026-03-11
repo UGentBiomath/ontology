@@ -859,14 +859,17 @@ wf:InfiltrationUnit rdfs:subClassOf energysource:WasteWaterDischarge .
 # 1. Define the 'Reading Container' (The swap point)
 energysource:Reading_MBR_Standard a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
+    qudt:numericValue 1.5 ;
     rdfs:label "Standard MBR Reading Container" .
 
   energysource:Reading_RO_Standard a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
+     qudt:numericValue 3.5 ;
     rdfs:label "Standard RO Reading Container" .
 
     energysource:Reading_Infiltration_Standard a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
+    qudt:numericValue 0.05 ;
     rdfs:label "Standard Infiltration Reading Container" .  
 
 # 2. Logic: Every MBR Instance inherits this container

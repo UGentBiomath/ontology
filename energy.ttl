@@ -1,4 +1,4 @@
-@prefix energysource:<https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix energysource:<  > .
 @prefix wf: <https://ugentbiomath.github.io/waterframe#> .
 @prefix housecase1: <https://ugentbiomath.github.io/ontology/index.ttl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -92,17 +92,17 @@ energysource:HydraulicSurfaceWashing a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "Hydraulic Surface Washing" .
 
-energysource:RO a owl:Class;
+energysource:ReverseOsmosis a owl:Class;
 rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " RO (Water Treatment)" .
+rdfs:label " Reverse Osmosis" .
 
-energysource:SeaWaterRO a owl:Class;
+energysource:SeaWaterReverseOsmosis a owl:Class;
 rdfs:subClassOf energysource:RO ;
-rdfs:label " Sea Water RO (Water Treatment)".
+rdfs:label " Sea Water Reverse Osmosis".
 
-energysource:BrackishRO a owl:Class;
+energysource:BrackishWaterReverseOsmosis a owl:Class;
 rdfs:subClassOf energysource:RO ;
-rdfs:label "Brackish RO (Water Treatment)".
+rdfs:label "Brackish Water Reverse Osomosis".
 
 energysource:MSF a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
@@ -160,7 +160,7 @@ energysource:HydraCAP60 a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label "HydraCAP 60" .
 
-energysource:Microfiltration a owl:Class ;
+energysource:MicroFiltration a owl:Class ;
 rdfs:subClassOf energysource:WaterTreatment;
 rdfs:label "Microfiltration" .
 
@@ -190,7 +190,7 @@ rdfs:label "Advanced Water Treatment" .
 
 energysource:WasteWaterPumping a owl:Class ;
 rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label " Tertiary waste water treatment" .
+rdfs:label " Waste Water Pumping" .
 
 energysource:AeratedGritRemoval a owl:Class ;
 rdfs:subClassOf energysource:WasteWaterTreatment ;
@@ -347,7 +347,7 @@ energysource:Reading_HydraCAP60_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
     rdfs:label "Standard HydraCAP 60 Reading" .
 
-energysource:Reading_Microfiltration_Std a qudt:QuantityValue ;
+energysource:Reading_MicroFiltration_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
 rdfs:label "Standard Microfiltration Reading" .
 
@@ -363,13 +363,13 @@ energysource:Reading_MED_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
     rdfs:label "Standard MED Reading" .
 
-energysource:Reading_SeaWaterRO_Std a qudt:QuantityValue ;
+energysource:Reading_SeaWater_ReverseOsmosis_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Sea Water RO Reading" .
+rdfs:label "Standard Sea Water Reverse Osmosis Reading" .
 
-energysource:Reading_BrackishRO_Std a qudt:QuantityValue ;
+energysource:Reading_Brackish_ReverseOsmosis_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Brackish RO Reading" .
+    rdfs:label "Standard Brackish Reverse Osmosis Reading" .
 
 energysource:Reading_Lagoons_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
@@ -423,17 +423,9 @@ energysource:Reading_ChlorineFeeding_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
     rdfs:label "Standard Chlorine Feeding Reading" .
 
-energysource:Reading_HighServicePump_Std a qudt:QuantityValue ;
+energysource:Reading_HighServicePumping_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
 rdfs:label "Standard High Service Pump Reading" .
-
-energysource:Reading_WellPump_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Well Pump Reading" .
-
-energysource:Reading_WasteWaterPump_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard WasteWater Pump Reading" .
 
 energysource:Reading_WellPumping_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
@@ -479,9 +471,9 @@ energysource:Reading_FilterFeedPump_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
 rdfs:label "Standard Filter Feed Pump Reading" .
 
-energysource:Reading_BioNitration_Std a qudt:QuantityValue ;
+energysource:Reading_BiologicalNitrification_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Biological Nitration Reading" .
+rdfs:label "Standard Biological Nitrification Reading" .
 
 #---------Energy Consumption--------------------------
 energysource:Filtration rdfs:subClassOf [
@@ -554,19 +546,27 @@ energysource:MVC rdfs:subClassOf [
 ] ;
 rdfs:label "MVC Process" .
 
-energysource:SeaWaterRO rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_SeaWaterRO_Std
-] ;
-rdfs:label "Sea Water RO Process" .
 
-energysource:BrackishRO rdfs:subClassOf [
+energysource:ReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_BrackishRO_Std
+    owl:hasValue energysource:Reading_MembraneBioReac_Std
 ] ;
-rdfs:label "Brackish RO Process" .
+rdfs:label "Reverse Osomosis Process" .
+
+energysource:SeaWaterReverseOsmosis rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty energysource:hasEnergyConsumption ;
+    owl:hasValue energysource:Reading_SeaWater_ReverseOsomosis_Std
+] ;
+rdfs:label "Sea Water Reverse Osmosis Process" .
+
+energysource:BrackishReverseOsmosis rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty energysource:hasEnergyConsumption ;
+    owl:hasValue energysource:Reading_Brackish_ReverseOsomosis_Std
+] ;
+rdfs:label "Brackish Water Reverse Osmosis Process" .
 
 energysource:Lagoons rdfs:subClassOf [
     a owl:Restriction ;
@@ -659,10 +659,10 @@ energysource:ChlorineFeeding rdfs:subClassOf [
 ] ;
 rdfs:label "Chlorine Feeding Process" .
 
-energysource:HighServicePump rdfs:subClassOf [
+energysource:HighServicePumping rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_HighServicePump_Std
+    owl:hasValue energysource:Reading_HighServicePumping_Std
 ] ;
 rdfs:label "High Service Pump Process" .
 
@@ -743,12 +743,12 @@ energysource:FilterFeedPump rdfs:subClassOf [
 ] ;
 rdfs:label "Filter Feed Pump Process" .
 
-energysource:BiologicalNitration rdfs:subClassOf [
+energysource:BiologicalNitrification rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_BioNitration_Std
+    owl:hasValue energysource:Reading_BiologicalNitrification_Std
 ] ;
-rdfs:label "Biological Nitration Process" .
+rdfs:label "Biological Nitrification Process" .
 #----------------------Restrictions-----------------------------------
 energysource:GroundWaterPumping
     rdfs:subClassOf [ 
@@ -852,51 +852,6 @@ energysource:GroundWaterPumping
 #-----------Household case scenario------------------------------
 wf:MembraneBioreactorUnit rdfs:subClassOf energysource:MembraneBio_Reactors .
 
-wf:ReverseOsmosisUnit rdfs:subClassOf energysource:RO .
+wf:ReverseOsmosisUnit rdfs:subClassOf energysource:ReverseOsmosis .
 
-wf:InfiltrationUnit rdfs:subClassOf energysource:WasteWaterDischarge .
-
-# 1. Define the 'Reading Container' (The swap point)
-energysource:Reading_MBR_Standard a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    qudt:numericValue 1.5 ;
-    rdfs:label "Standard MBR Reading Container" .
-
-  energysource:Reading_RO_Standard a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-     qudt:numericValue 3.5 ;
-    rdfs:label "Standard RO Reading Container" .
-
-    energysource:Reading_Infiltration_Standard a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    qudt:numericValue 0.05 ;
-    rdfs:label "Standard Infiltration Reading Container" .  
-
-# 2. Logic: Every MBR Instance inherits this container
-energysource:MembraneBio_Reactors rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MBR_Standard
-] .
-
-energysource:RO rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_RO_Standard
-] .
-
-energysource:WasteWaterDischarge rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Infiltration_Standard
-] .
-
-
-
-
-
-
-
-
-
-    
+wf:InfiltrationUnit rdfs:subClassOf energysource:Infiltration .

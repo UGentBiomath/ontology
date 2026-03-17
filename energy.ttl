@@ -1,4 +1,4 @@
-@prefix energysource:<  > .
+@prefix energysource:<https://ugentbiomath.github.io/ontology/energy.ttl#> .
 @prefix wf: <https://ugentbiomath.github.io/waterframe#> .
 @prefix housecase1: <https://ugentbiomath.github.io/ontology/index.ttl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -97,11 +97,11 @@ rdfs:subClassOf energysource:WaterTreatment ;
 rdfs:label " Reverse Osmosis" .
 
 energysource:SeaWaterReverseOsmosis a owl:Class;
-rdfs:subClassOf energysource:RO ;
+rdfs:subClassOf energysource:ReverseOsmosis ;
 rdfs:label " Sea Water Reverse Osmosis".
 
 energysource:BrackishWaterReverseOsmosis a owl:Class;
-rdfs:subClassOf energysource:RO ;
+rdfs:subClassOf energysource:ReverseOsmosis ;
 rdfs:label "Brackish Water Reverse Osomosis".
 
 energysource:MSF a owl:Class ;
@@ -267,7 +267,8 @@ energysource:hasVariable a owl:ObjectProperty ;
     rdfs:range qudt:QuantityValue .
 
 energysource:hasLiftDistance a owl:ObjectProperty;
-rdfs:subPropertyOf energysource:hasVariable.
+rdfs:subPropertyOf energysource:hasVariable ;
+rdfs:label "Lift Distance (l)" .
 
 energysource:hasFlowVolume a owl:ObjectProperty ; 
 rdfs:subPropertyOf energysource:hasVariable .
@@ -318,6 +319,10 @@ rdfs:subPropertyOf energysource:hasVariable .
 energysource:Reading_Filtration_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
     rdfs:label "Standard Filtration Reading" .
+    
+    energysource:Reading_DistributionPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Distribution Pumping Reading" .
 
 energysource:Reading_BoosterPumping_Std a qudt:QuantityValue ;
 qudt:unit unit:KiloWattHourPerCubicMeter ;
@@ -511,6 +516,13 @@ energysource:GroundWaterChlorinationandDechlorination rdfs:subClassOf [
 ] ;
 rdfs:label "Ground Water Chlorination & Dechlorination Process" .
 
+energysource:Ozone rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty energysource:hasEnergyConsumption ;
+    owl:hasValue energysource:Reading_Ozone_Std
+] ;
+rdfs:label "Ozone Process" .
+
 energysource:HydraCAP60 rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
@@ -546,7 +558,6 @@ energysource:MVC rdfs:subClassOf [
 ] ;
 rdfs:label "MVC Process" .
 
-
 energysource:ReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
@@ -561,7 +572,7 @@ energysource:SeaWaterReverseOsmosis rdfs:subClassOf [
 ] ;
 rdfs:label "Sea Water Reverse Osmosis Process" .
 
-energysource:BrackishReverseOsmosis rdfs:subClassOf [
+energysource:BrackishWaterReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ;
     owl:onProperty energysource:hasEnergyConsumption ;
     owl:hasValue energysource:Reading_Brackish_ReverseOsomosis_Std
@@ -749,6 +760,13 @@ energysource:BiologicalNitrification rdfs:subClassOf [
     owl:hasValue energysource:Reading_BiologicalNitrification_Std
 ] ;
 rdfs:label "Biological Nitrification Process" .
+
+energysource:DistributionPumping rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty energysource:hasEnergyConsumption ;
+    owl:hasValue energysource:Reading_DistributionPumping_Std
+] ;
+rdfs:label "Biological Nitrification Process" .
 #----------------------Restrictions-----------------------------------
 energysource:GroundWaterPumping
     rdfs:subClassOf [ 
@@ -848,10 +866,3 @@ energysource:GroundWaterPumping
         owl:onProperty energysource:hasPrecipitationRate ; 
         owl:someValuesFrom qudt:QuantityValue 
     ] .
-
-#-----------Household case scenario------------------------------
-wf:MembraneBioreactorUnit rdfs:subClassOf energysource:MembraneBio_Reactors .
-
-wf:ReverseOsmosisUnit rdfs:subClassOf energysource:ReverseOsmosis .
-
-wf:InfiltrationUnit rdfs:subClassOf energysource:Infiltration .

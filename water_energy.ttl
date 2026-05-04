@@ -1,0 +1,918 @@
+@prefix water:   <https://ugentbiomath.github.io/ontology/water_energy.ttl#> .
+@prefix energy:  <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix qudt:    <http://qudt.org/schema/qudt/> .
+@prefix unit:    <http://qudt.org/vocab/unit/> .
+
+
+# =============================================================================
+# ONTOLOGY DECLARATION
+# =============================================================================
+
+<https://ugentbiomath.github.io/ontology/water_energy.ttl>
+    a owl:Ontology ;
+    owl:imports <https://ugentbiomath.github.io/ontology/energy.ttl> ;
+    rdfs:label "Water Domain Energy Ontology" ;
+    rdfs:comment """
+        Water domain extension of the Energy Framework Ontology.
+        Imports: energy.ttl <https://ugentbiomath.github.io/ontology/energy.ttl>
+
+        This file defines energy consumption in the water and wastewater sector.
+        water:WaterEnergyConsumption is a subclass of energy:EnergyConsumption,
+        meaning every water process consumption event is also an energy consumption
+        event traceable to an EnergySource via the general framework.
+
+        SCOPE:
+          - Water conveyance (groundwater pumping, surface water pumping)
+          - Water treatment (physical separation, disinfection, chemical dosing,
+                            membrane treatment, thermal desalination, in-plant pumping)
+          - Water distribution
+          - Wastewater collection, treatment, and discharge
+          - Recycled water treatment and distribution
+
+        PROCESS SUB-GROUPING:
+          WaterTreatment processes are grouped by mechanism:
+            ChemicalDosing, Disinfection, PhysicalSeparation,
+            MembraneTreatment, ThermalDesalination, PumpingWithinTreatment
+
+          WasteWaterTreatment processes follow the treatment train:
+            PrimaryTreatment, SecondaryTreatment, TertiaryTreatment,
+            SludgeTreatment, WasteWaterPumping
+
+        ENERGY READINGS:
+          Standard benchmark readings (Reading_*_Std) are defined as
+          qudt:QuantityValue individuals in kWh/m³ and bound to leaf process
+          classes via owl:Restriction on water:hasEnergyConsumption.
+          Hourly measured readings are recorded in instance data files that
+          import this ontology and use sosa:Observation with energy:isMeasurementType
+          to distinguish measured from derived values.
+
+        DEMAND TYPES IN THIS DOMAIN:
+          - Mechanical work  : pumping, mixing, aeration
+          - Chemical         : dosing, disinfection, chlorination
+          - Thermal          : desalination (MSF, MED, MVC)
+          - Electrochemical  : UV irradiation, ozone generation
+    """ .
+
+
+# =============================================================================
+# TIER 1 — WATER ENERGY CONSUMPTION
+# =============================================================================
+# Subclass of energy:EnergyConsumption. The water sector domain node.
+# All water process consumption traces up through this class to
+# energy:EnergyConsumption and ultimately to energy:EnergySource.
+
+water:WaterEnergyConsumption a owl:Class ;
+    rdfs:subClassOf energy:EnergyConsumption ;
+    rdfs:label "Water Energy Consumption" ;
+    rdfs:comment """
+        Energy consumed specifically within the water and wastewater sector.
+        Subclass of energy:EnergyConsumption. Domain-specific processes are
+        modelled as subclasses of water:WaterProcess below this node.
+        Sibling domains (industrial, building, solar) are defined in their
+        own extension files at the same level under energy:EnergyConsumption.
+    """ .
+
+
+# =============================================================================
+# TIER 2 — WATER PROCESS
+# =============================================================================
+# A WaterProcess is the activity that creates the EnergyDemand within
+# the water sector. It is the unit of consumption measurement.
+# All leaf process classes carry hasEnergyConsumption restrictions
+# binding them to their standard benchmark readings.
+
+water:WaterProcess a owl:Class ;
+    rdfs:subClassOf water:WaterEnergyConsumption ;
+    rdfs:label "Water Process" ;
+    rdfs:comment "A unit process in the water or wastewater cycle that consumes energy to perform mechanical, chemical, thermal, or electrochemical work." .
+
+
+# =============================================================================
+# PROPERTIES — Energy consumption and input variables on WaterProcess
+# =============================================================================
+
+water:hasEnergyConsumption a owl:ObjectProperty ;
+    rdfs:domain water:WaterProcess ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "has energy consumption" ;
+    rdfs:comment "Links a WaterProcess to its benchmark energy consumption value (qudt:QuantityValue in kWh/m³). Subproperties distinguish electrical from thermal consumption." .
+
+water:hasElectricalEnergyConsumption a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasEnergyConsumption ;
+    rdfs:domain water:WaterProcess ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "has electrical energy consumption" .
+
+water:hasThermalEnergyConsumption a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasEnergyConsumption ;
+    rdfs:domain water:WaterProcess ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "has thermal energy consumption" .
+
+water:hasVariable a owl:ObjectProperty ;
+    rdfs:domain water:WaterProcess ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "has variable" ;
+    rdfs:comment "Links a WaterProcess to one of its input variables used in energy calculation." .
+
+water:hasLiftDistance a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has lift distance" .
+
+water:hasFlowVolume a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has flow volume" .
+
+water:hasPressureRequirement a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has pressure requirement" .
+
+water:hasTime a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has time" .
+
+water:hasLengthOfPipeline a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has length of pipeline" .
+
+water:hasCrossSectionArea a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has cross section area" .
+
+water:hasHazenWilliamsCoefficient a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has Hazen-Williams coefficient" .
+
+water:hasSlope a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has slope" .
+
+water:hasAge a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has age" .
+
+water:hasChannelLength a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has channel length" .
+
+water:hasConstantSpecificToMaterial a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has constant specific to material" .
+
+water:hasSoilPermeability a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has soil permeability" .
+
+water:hasBedSlope a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has bed slope" .
+
+water:hasFrictionalandVegetativeResistance a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has frictional and vegetative resistance" .
+
+water:hasEvapotranspirationRate a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has evapotranspiration rate" .
+
+water:hasPrecipitationRate a owl:ObjectProperty ;
+    rdfs:subPropertyOf water:hasVariable ;
+    rdfs:label "has precipitation rate" .
+
+
+# =============================================================================
+# TIER 3 — WATER CYCLE PROCESS CATEGORIES
+# =============================================================================
+
+water:WaterConveyance a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Water Conveyance" ;
+    rdfs:comment "Transport of raw water from source to treatment facility. Demand type: Mechanical." .
+
+water:WaterTreatment a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Water Treatment" ;
+    rdfs:comment "Treatment of raw water for potable or process use. Sub-grouped by mechanism." .
+
+water:WaterDistribution a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Water Distribution" ;
+    rdfs:comment "Delivery of treated water to end users. Demand type: Mechanical." .
+
+water:WasteWaterCollection a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Waste Water Collection" .
+
+water:WasteWaterTreatment a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Waste Water Treatment" ;
+    rdfs:comment "Treatment of wastewater prior to discharge or reuse. Sub-grouped by treatment train stage." .
+
+water:WasteWaterDischarge a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Waste Water Discharge" .
+
+water:RecycledWasteWaterTreatment a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Recycled Waste Water Treatment" .
+
+water:RecycledWaterDistribution a owl:Class ;
+    rdfs:subClassOf water:WaterProcess ;
+    rdfs:label "Recycled Water Distribution" .
+
+
+# =============================================================================
+# TIER 4 — WATER CONVEYANCE SUB-PROCESSES
+# =============================================================================
+
+water:GroundWaterPumping a owl:Class ;
+    rdfs:subClassOf water:WaterConveyance ;
+    rdfs:label "Ground Water Pumping" .
+
+water:WellPumping a owl:Class ;
+    rdfs:subClassOf water:GroundWaterPumping ;
+    rdfs:label "Well Pumping" .
+
+water:BoosterPumping a owl:Class ;
+    rdfs:subClassOf water:GroundWaterPumping ;
+    rdfs:label "Booster Pumping" .
+
+water:SurfaceWaterPumping a owl:Class ;
+    rdfs:subClassOf water:WaterConveyance ;
+    rdfs:label "Surface Water Pumping" .
+
+water:SurfaceWaterPumping_Normal a owl:Class ;
+    rdfs:subClassOf water:SurfaceWaterPumping ;
+    rdfs:label "Normal Surface Water Pumping" .
+
+water:SurfaceWaterPumping_Gravity a owl:Class ;
+    rdfs:subClassOf water:SurfaceWaterPumping ;
+    rdfs:label "Gravity-driven Surface Water Pumping" .
+
+
+# =============================================================================
+# TIER 4 — WATER TREATMENT SUB-GROUPS (grouped by mechanism)
+# =============================================================================
+
+water:ChemicalDosing a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Chemical Dosing" ;
+    rdfs:comment "Processes that introduce a chemical agent into the water stream. Demand type: Chemical." .
+
+water:CoagulantFeeding a owl:Class ;
+    rdfs:subClassOf water:ChemicalDosing ;
+    rdfs:label "Coagulant Feeding" .
+
+water:ChlorineFeeding a owl:Class ;
+    rdfs:subClassOf water:ChemicalDosing ;
+    rdfs:label "Chlorine Feeding" .
+
+water:ChemicalAddition a owl:Class ;
+    rdfs:subClassOf water:ChemicalDosing ;
+    rdfs:label "Chemical Addition" .
+
+# ---
+
+water:Disinfection a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Disinfection" ;
+    rdfs:comment "Inactivation of pathogens by chemical or physical means. Demand type: Chemical or Electrochemical." .
+
+water:Chlorination a owl:Class ;
+    rdfs:subClassOf water:Disinfection ;
+    rdfs:label "Chlorination" .
+
+water:SurfaceWaterChlorinationandDechlorination a owl:Class ;
+    rdfs:subClassOf water:Disinfection ;
+    rdfs:label "Surface Water Chlorination and Dechlorination" .
+
+water:GroundWaterChlorinationandDechlorination a owl:Class ;
+    rdfs:subClassOf water:Disinfection ;
+    rdfs:label "Ground Water Chlorination and Dechlorination" .
+
+water:UVIrradiation a owl:Class ;
+    rdfs:subClassOf water:Disinfection ;
+    rdfs:label "UV Irradiation" .
+
+water:Ozone a owl:Class ;
+    rdfs:subClassOf water:Disinfection ;
+    rdfs:label "Ozone Treatment" .
+
+# ---
+
+water:PhysicalSeparation a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Physical Separation" ;
+    rdfs:comment "Separation of suspended solids by physical forces. Demand type: Mechanical." .
+
+water:RapidMixing a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Rapid Mixing" .
+
+water:Flocculation a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Flocculation" .
+
+water:Sedimentation a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Sedimentation" .
+
+water:GravityFiltration a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Gravity Filtration" .
+
+water:HydraulicSurfaceWashing a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Hydraulic Surface Washing" .
+
+water:BackWashPumping a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Back Wash Pumping" .
+
+water:MicroFiltration a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "Microfiltration" .
+
+water:HydraCAP60 a owl:Class ;
+    rdfs:subClassOf water:PhysicalSeparation ;
+    rdfs:label "HydraCAP 60" .
+
+# ---
+
+water:MembraneTreatment a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Membrane Treatment" ;
+    rdfs:comment "Pressure-driven membrane separation. Demand type: Mechanical (high pressure)." .
+
+water:ReverseOsmosis a owl:Class ;
+    rdfs:subClassOf water:MembraneTreatment ;
+    rdfs:label "Reverse Osmosis" .
+
+water:SeaWaterReverseOsmosis a owl:Class ;
+    rdfs:subClassOf water:ReverseOsmosis ;
+    rdfs:label "Sea Water Reverse Osmosis" .
+
+water:BrackishWaterReverseOsmosis a owl:Class ;
+    rdfs:subClassOf water:ReverseOsmosis ;
+    rdfs:label "Brackish Water Reverse Osmosis" .
+
+# ---
+
+water:ThermalDesalination a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Thermal Desalination" ;
+    rdfs:comment "Heat-driven desalination. Demand type: Thermal. Separated from membrane treatment because the energy carrier is thermal, not electrical pressure." .
+
+water:MSF a owl:Class ;
+    rdfs:subClassOf water:ThermalDesalination ;
+    rdfs:label "MSF Desalination" .
+
+water:MED a owl:Class ;
+    rdfs:subClassOf water:ThermalDesalination ;
+    rdfs:label "MED Desalination" .
+
+water:MVC a owl:Class ;
+    rdfs:subClassOf water:ThermalDesalination ;
+    rdfs:label "MVC Desalination" .
+
+# ---
+
+water:PumpingWithinTreatment a owl:Class ;
+    rdfs:subClassOf water:WaterTreatment ;
+    rdfs:label "Pumping Within Treatment" ;
+    rdfs:comment "Pumping operations occurring inside the treatment plant boundary. Distinct from conveyance pumping." .
+
+water:InPlantPumping a owl:Class ;
+    rdfs:subClassOf water:PumpingWithinTreatment ;
+    rdfs:label "In-Plant Pumping" .
+
+water:HighServicePumping a owl:Class ;
+    rdfs:subClassOf water:PumpingWithinTreatment ;
+    rdfs:label "High Service Pumping" .
+
+
+# =============================================================================
+# TIER 4 — WATER DISTRIBUTION SUB-PROCESSES
+# =============================================================================
+
+water:DistributionPumping a owl:Class ;
+    rdfs:subClassOf water:WaterDistribution ;
+    rdfs:label "Distribution Pumping" .
+
+
+# =============================================================================
+# TIER 4 — WASTEWATER TREATMENT SUB-GROUPS (grouped by treatment train stage)
+# =============================================================================
+
+water:PrimaryTreatment a owl:Class ;
+    rdfs:subClassOf water:WasteWaterTreatment ;
+    rdfs:label "Primary Treatment" ;
+    rdfs:comment "Physical screening and settling of solids. First stage of the wastewater treatment train." .
+
+water:AeratedGritRemoval a owl:Class ;
+    rdfs:subClassOf water:PrimaryTreatment ;
+    rdfs:label "Aerated Grit Removal" .
+
+water:PrimaryClarifiers a owl:Class ;
+    rdfs:subClassOf water:PrimaryTreatment ;
+    rdfs:label "Primary Clarifiers" .
+
+# ---
+
+water:SecondaryTreatment a owl:Class ;
+    rdfs:subClassOf water:WasteWaterTreatment ;
+    rdfs:label "Secondary Treatment" ;
+    rdfs:comment "Biological degradation of dissolved organics. Demand type: Mechanical (aeration) and Chemical." .
+
+water:ActivatedSludge a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Activated Sludge" .
+
+water:OxidationDitch a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Oxidation Ditch" .
+
+water:Trickling a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Trickling" .
+
+water:MembraneBio_Reactors a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Membrane Bio Reactors" .
+
+water:Lagoons a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Lagoons" .
+
+water:Aeration a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Aeration" .
+
+water:ReturnSludgePumping a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Return Sludge Pumping" .
+
+water:SecondaryClarifiers a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Secondary Clarifiers" .
+
+water:BiologicalNitrification a owl:Class ;
+    rdfs:subClassOf water:SecondaryTreatment ;
+    rdfs:label "Biological Nitrification" .
+
+# ---
+
+water:TertiaryTreatment a owl:Class ;
+    rdfs:subClassOf water:WasteWaterTreatment ;
+    rdfs:label "Tertiary Treatment" ;
+    rdfs:comment "Post-biological polishing to meet discharge or reuse standards." .
+
+water:AdvancedWaterTreatment a owl:Class ;
+    rdfs:subClassOf water:TertiaryTreatment ;
+    rdfs:label "Advanced Water Treatment" .
+
+water:Filtration a owl:Class ;
+    rdfs:subClassOf water:TertiaryTreatment ;
+    rdfs:label "Filtration" .
+
+water:FilterFeedPumping a owl:Class ;
+    rdfs:subClassOf water:TertiaryTreatment ;
+    rdfs:label "Filter Feed Pumping" .
+
+# ---
+
+water:SludgeTreatment a owl:Class ;
+    rdfs:subClassOf water:WasteWaterTreatment ;
+    rdfs:label "Sludge Treatment" ;
+    rdfs:comment "Treatment and stabilisation of solid residuals generated during wastewater treatment." .
+
+water:Digestion a owl:Class ;
+    rdfs:subClassOf water:SludgeTreatment ;
+    rdfs:label "Digestion" .
+
+water:Dewatering a owl:Class ;
+    rdfs:subClassOf water:SludgeTreatment ;
+    rdfs:label "Dewatering" .
+
+# ---
+
+water:WasteWaterPumping a owl:Class ;
+    rdfs:subClassOf water:WasteWaterTreatment ;
+    rdfs:label "Waste Water Pumping" ;
+    rdfs:comment "General pumping in the wastewater network (lift stations, collection conveyance). Kept separate from process-specific pumping." .
+
+
+# =============================================================================
+# STANDARD READING INDIVIDUALS (benchmark kWh/m³ values per process)
+# =============================================================================
+# These are schema-level anchor individuals. Instance data files attach
+# hourly sosa:Observation values to process individuals referencing these
+# as their type template via energy:isReadingOf.
+
+water:Reading_BoosterPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Booster Pumping Reading" .
+
+water:Reading_WellPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Well Pumping Reading" .
+
+water:Reading_DistributionPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Distribution Pumping Reading" .
+
+water:Reading_Coagulant_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Coagulant Feeding Reading" .
+
+water:Reading_ChlorineFeeding_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chlorine Feeding Reading" .
+
+water:Reading_ChemicalAddition_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chemical Addition Reading" .
+
+water:Reading_Chlorination_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chlorination Reading" .
+
+water:Reading_SurfaceWaterChlorandDechlor_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Surface Water Chlorination and Dechlorination Reading" .
+
+water:Reading_GroundWaterChlorandDechlor_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Ground Water Chlorination and Dechlorination Reading" .
+
+water:Reading_UVIrradiation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard UV Irradiation Reading" .
+
+water:Reading_Ozone_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Ozone Reading" .
+
+water:Reading_RapidMixing_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Rapid Mixing Reading" .
+
+water:Reading_Flocculation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Flocculation Reading" .
+
+water:Reading_Sedimentation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Sedimentation Reading" .
+
+water:Reading_GravityFiltration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Gravity Filtration Reading" .
+
+water:Reading_HydraulicSurfaceWash_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Hydraulic Surface Wash Reading" .
+
+water:Reading_BackWash_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Back Wash Pumping Reading" .
+
+water:Reading_MicroFiltration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Microfiltration Reading" .
+
+water:Reading_HydraCAP60_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard HydraCAP 60 Reading" .
+
+water:Reading_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Reverse Osmosis Reading" .
+
+water:Reading_SeaWater_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Sea Water Reverse Osmosis Reading" .
+
+water:Reading_Brackish_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Brackish Water Reverse Osmosis Reading" .
+
+water:Reading_MSF_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MSF Reading" .
+
+water:Reading_MED_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MED Reading" .
+
+water:Reading_MVC_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MVC Reading" .
+
+water:Reading_InPlant_Pumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard In-Plant Pumping Reading" .
+
+water:Reading_HighServicePumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard High Service Pumping Reading" .
+
+water:Reading_AeratedGrit_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Aerated Grit Removal Reading" .
+
+water:Reading_PrimaryClarifiers_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Primary Clarifiers Reading" .
+
+water:Reading_ActivatedSludge_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Activated Sludge Reading" .
+
+water:Reading_OxidationDitch_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Oxidation Ditch Reading" .
+
+water:Reading_Trickling_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Trickling Reading" .
+
+water:Reading_MembraneBioReac_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Membrane Bio Reactor Reading" .
+
+water:Reading_Lagoons_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Lagoons Reading" .
+
+water:Reading_Aeration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Aeration Reading" .
+
+water:Reading_ReturnSludgePump_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Return Sludge Pumping Reading" .
+
+water:Reading_SecondaryClarifiers_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Secondary Clarifiers Reading" .
+
+water:Reading_BiologicalNitrification_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Biological Nitrification Reading" .
+
+water:Reading_AdvancedWaterTreatment_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Advanced Water Treatment Reading" .
+
+water:Reading_Filtration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Filtration Reading" .
+
+water:Reading_FilterFeedPump_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Filter Feed Pumping Reading" .
+
+water:Reading_Digestion_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Digestion Reading" .
+
+water:Reading_Dewatering_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Dewatering Reading" .
+
+water:Reading_WasteWaterPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Waste Water Pumping Reading" .
+
+
+# =============================================================================
+# OWL RESTRICTIONS — binding standard readings to leaf process classes
+# =============================================================================
+# These restrictions declare that every instance of a leaf process class
+# has a specific benchmark energy consumption value. SPARQL queries against
+# this ontology will return the standard reading for any process instance
+# without needing the value to be asserted on the individual directly.
+
+water:BoosterPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_BoosterPumping_Std ] .
+
+water:WellPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_WellPumping_Std ] .
+
+water:DistributionPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_DistributionPumping_Std ] .
+
+water:CoagulantFeeding rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Coagulant_Std ] .
+
+water:ChlorineFeeding rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_ChlorineFeeding_Std ] .
+
+water:ChemicalAddition rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_ChemicalAddition_Std ] .
+
+water:Chlorination rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Chlorination_Std ] .
+
+water:SurfaceWaterChlorinationandDechlorination rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_SurfaceWaterChlorandDechlor_Std ] .
+
+water:GroundWaterChlorinationandDechlorination rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_GroundWaterChlorandDechlor_Std ] .
+
+water:UVIrradiation rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_UVIrradiation_Std ] .
+
+water:Ozone rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Ozone_Std ] .
+
+water:RapidMixing rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_RapidMixing_Std ] .
+
+water:Flocculation rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Flocculation_Std ] .
+
+water:Sedimentation rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Sedimentation_Std ] .
+
+water:GravityFiltration rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_GravityFiltration_Std ] .
+
+water:HydraulicSurfaceWashing rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_HydraulicSurfaceWash_Std ] .
+
+water:BackWashPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_BackWash_Std ] .
+
+water:MicroFiltration rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_MicroFiltration_Std ] .
+
+water:HydraCAP60 rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_HydraCAP60_Std ] .
+
+water:ReverseOsmosis rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_ReverseOsmosis_Std ] .
+
+water:SeaWaterReverseOsmosis rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_SeaWater_ReverseOsmosis_Std ] .
+
+water:BrackishWaterReverseOsmosis rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Brackish_ReverseOsmosis_Std ] .
+
+water:MSF rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
+    owl:hasValue water:Reading_MSF_Std ] .
+
+water:MED rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
+    owl:hasValue water:Reading_MED_Std ] .
+
+water:MVC rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
+    owl:hasValue water:Reading_MVC_Std ] .
+
+water:InPlantPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_InPlant_Pumping_Std ] .
+
+water:HighServicePumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_HighServicePumping_Std ] .
+
+water:AeratedGritRemoval rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_AeratedGrit_Std ] .
+
+water:PrimaryClarifiers rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_PrimaryClarifiers_Std ] .
+
+water:ActivatedSludge rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_ActivatedSludge_Std ] .
+
+water:OxidationDitch rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_OxidationDitch_Std ] .
+
+water:Trickling rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Trickling_Std ] .
+
+water:MembraneBio_Reactors rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_MembraneBioReac_Std ] .
+
+water:Lagoons rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Lagoons_Std ] .
+
+water:Aeration rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Aeration_Std ] .
+
+water:ReturnSludgePumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_ReturnSludgePump_Std ] .
+
+water:SecondaryClarifiers rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_SecondaryClarifiers_Std ] .
+
+water:BiologicalNitrification rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_BiologicalNitrification_Std ] .
+
+water:AdvancedWaterTreatment rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_AdvancedWaterTreatment_Std ] .
+
+water:Filtration rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Filtration_Std ] .
+
+water:FilterFeedPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_FilterFeedPump_Std ] .
+
+water:Digestion rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Digestion_Std ] .
+
+water:Dewatering rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_Dewatering_Std ] .
+
+water:WasteWaterPumping rdfs:subClassOf [
+    a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
+    owl:hasValue water:Reading_WasteWaterPumping_Std ] .
+
+
+# =============================================================================
+# OWL RESTRICTIONS — input variables required per WaterProcess subclass
+# =============================================================================
+
+water:GroundWaterPumping
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLiftDistance ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFlowVolume ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPressureRequirement ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasTime ;
+        owl:someValuesFrom qudt:QuantityValue ] .
+
+water:SurfaceWaterPumping_Normal
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLengthOfPipeline ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasCrossSectionArea ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasHazenWilliamsCoefficient ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSlope ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasAge ;
+        owl:someValuesFrom qudt:QuantityValue ] .
+
+water:SurfaceWaterPumping_Gravity
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasChannelLength ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasConstantSpecificToMaterial ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSoilPermeability ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasBedSlope ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFrictionalandVegetativeResistance ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasEvapotranspirationRate ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPrecipitationRate ;
+        owl:someValuesFrom qudt:QuantityValue ] .

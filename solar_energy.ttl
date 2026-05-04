@@ -1,0 +1,314 @@
+@prefix solar:   <https://ugentbiomath.github.io/ontology/solar_energy.ttl#> .
+@prefix energy:  <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix qudt:    <http://qudt.org/schema/qudt/> .
+@prefix unit:    <http://qudt.org/vocab/unit/> .
+@prefix sosa:    <http://www.w3.org/ns/sosa/> .
+
+
+# =============================================================================
+# ONTOLOGY DECLARATION
+# =============================================================================
+
+<https://ugentbiomath.github.io/ontology/solar_energy.ttl>
+    a owl:Ontology ;
+    owl:imports <https://ugentbiomath.github.io/ontology/energy.ttl> ;
+    rdfs:label "Solar Domain Energy Ontology" ;
+    rdfs:comment """
+        Solar domain extension of the Energy Framework Ontology.
+        Imports: energy.ttl <https://ugentbiomath.github.io/ontology/energy.ttl>
+
+        This file defines the classes, properties, and observable property individuals
+        needed to model a solar PV system supplying energy to a water treatment
+        installation. It covers:
+
+          (1) ENERGY SYSTEM COMPONENTS
+              Physical nodes in the energy flow network:
+              Solar PV array, electricity grid, electrical distribution panel.
+
+          (2) EQUIPMENT COMPONENTS
+              Sub-components of treatment units that carry energy specifications:
+              Aeration blower (rated power), high-pressure pump (specific energy).
+
+          (3) SENSORS
+              Devices that produce observations:
+              PowerMeter (kW), LoadSensor (dimensionless fraction), FlowSensor (m³/h).
+
+          (4) SOLAR ENERGY CONSUMPTION
+              solar:SolarEnergyConsumption as subclass of energy:EnergyConsumption,
+              covering the measurable energy drawn from or supplied by the solar system.
+
+          (5) OBSERVABLE PROPERTIES
+              Named individuals for sosa:observedProperty links in instance data.
+
+        DERIVATION PATTERNS supported by this ontology:
+          Pattern 1 — MBR power from blower load:
+            MBR_power (kW) = solar:ratedPower × solar:LoadFraction observation value
+
+          Pattern 2 — RO power from feed flow:
+            RO_power (kW)  = solar:specificEnergy × solar:FlowRate observation value
+
+          Pattern 3 — Grid power as balance:
+            Grid_power (kW) = MAX(0, MBR_power + RO_power − Solar_power)
+            Grid readings carry energy:isMeasurementType = 'Derived'
+            Solar, MBR, RO readings carry energy:isMeasurementType = 'Measured'
+
+        INSTANCE DATA:
+          Hourly observations are stored in case-level files (e.g.
+          household_energy_timeseries.ttl) using sosa:Observation with
+          sosa:madeBySensor, sosa:featureOfInterest, sosa:observedProperty,
+          sosa:hasSimpleResult, and sosa:resultTime.
+
+        RELATIONSHIP TO WATER DOMAIN:
+          This file is independent of water_energy.ttl. Both import energy.ttl.
+          A scenario combining solar supply with water treatment consumption imports
+          both this file and water_energy.ttl in the instance data file.
+    """ .
+
+
+# =============================================================================
+# SOLAR ENERGY CONSUMPTION
+# =============================================================================
+# Subclass of energy:EnergyConsumption. The solar domain node.
+# Covers both consumption BY the solar system (inverter losses, controls)
+# and the consumption OFFSET by solar generation (what the grid does not need
+# to supply). The balance is modelled via the grid derivation pattern.
+
+solar:SolarEnergyConsumption a owl:Class ;
+    rdfs:subClassOf energy:EnergyConsumption ;
+    rdfs:label "Solar Energy Consumption" ;
+    rdfs:comment """
+        Energy consumption in the context of a solar PV system. Subclass of
+        energy:EnergyConsumption. Covers the energy flows measurable within
+        a solar-assisted installation: PV generation, grid import balance,
+        and equipment-level consumption (MBR, RO) supplied by the combined
+        solar + grid source.
+    """ .
+
+
+# =============================================================================
+# ENERGY SYSTEM COMPONENTS
+# =============================================================================
+# Physical nodes in the energy flow network. These are the
+# sosa:featureOfInterest targets for sensor observations in instance data.
+
+solar:EnergySystemComponent a owl:Class ;
+    rdfs:label "Energy System Component" ;
+    rdfs:comment "A physical node in the energy flow network of an installation. Sensors are attached to components; observations have components as their feature of interest." .
+
+solar:SolarPVSystem a owl:Class ;
+    rdfs:subClassOf solar:EnergySystemComponent ;
+    rdfs:subClassOf energy:SolarEnergy ;
+    rdfs:label "Solar PV System" ;
+    rdfs:comment """
+        A photovoltaic system that converts solar irradiance into electrical power.
+        Instances represent a specific installation (e.g. a 3 kWp rooftop array).
+        Observed via a PowerMeter sensor. Generation is Measured; surplus exported
+        to grid is not modelled here.
+        Carrier: Electrical. Origin: Primary. Availability: Intermittent.
+    """ .
+
+solar:GridConnection a owl:Class ;
+    rdfs:subClassOf solar:EnergySystemComponent ;
+    rdfs:subClassOf energy:ElectricityGrid ;
+    rdfs:label "Grid Connection" ;
+    rdfs:comment """
+        The point of connection to the external electricity grid.
+        Grid power drawn = MAX(0, total treatment demand - solar generation).
+        Observed via a PowerMeter sensor. Grid readings are Derived values —
+        they are computed from MBR power + RO power - Solar power.
+        Carrier: Electrical. Origin: Secondary. Availability: Continuous.
+    """ .
+
+solar:ElectricalPanel a owl:Class ;
+    rdfs:subClassOf solar:EnergySystemComponent ;
+    rdfs:label "Electrical Panel" ;
+    rdfs:comment "Main distribution board aggregating grid import and solar generation, feeding treatment unit equipment. Central routing node — not directly observed by a power meter." .
+
+
+# =============================================================================
+# EQUIPMENT COMPONENTS
+# =============================================================================
+# Sub-components of treatment units that carry rated energy specifications.
+# These are the sosa:featureOfInterest targets for load and flow sensors,
+# and carry the parameters used in derivation patterns 1 and 2.
+
+solar:EquipmentComponent a owl:Class ;
+    rdfs:label "Equipment Component" ;
+    rdfs:comment "A mechanical or electrical sub-component of a treatment unit. Carries rated energy parameters (ratedPower, specificEnergy) used in power derivation calculations." .
+
+solar:AerationBlower a owl:Class ;
+    rdfs:subClassOf solar:EquipmentComponent ;
+    rdfs:label "Aeration Blower" ;
+    rdfs:comment """
+        Rotary lobe or centrifugal blower providing air for biological treatment
+        and membrane scouring. Rated power defines maximum draw; actual draw
+        varies with load fraction (Pattern 1 derivation).
+        Derivation: power (kW) = solar:ratedPower × LoadFraction
+    """ .
+
+solar:HighPressurePump a owl:Class ;
+    rdfs:subClassOf solar:EquipmentComponent ;
+    rdfs:label "High Pressure Pump" ;
+    rdfs:comment """
+        Feed pump for reverse osmosis units. Specific energy defines power per
+        unit flow processed (Pattern 2 derivation). Runs only when RO is active.
+        Derivation: power (kW) = solar:specificEnergy (kWh/m³) × FeedFlow (m³/h)
+    """ .
+
+# --- Equipment energy specification properties ---
+
+solar:ratedPower a owl:ObjectProperty ;
+    rdfs:domain solar:AerationBlower ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "rated power" ;
+    rdfs:comment "Maximum nameplate power draw of the blower at full load (unit: kW). Used as the multiplier in Pattern 1 derivation." .
+
+solar:specificEnergy a owl:ObjectProperty ;
+    rdfs:domain solar:HighPressurePump ;
+    rdfs:range qudt:QuantityValue ;
+    rdfs:label "specific energy" ;
+    rdfs:comment "Energy consumed per cubic metre of feed water processed (unit: kWh/m³). Used as the multiplier in Pattern 2 derivation." .
+
+
+# =============================================================================
+# SENSORS
+# =============================================================================
+# Sensor classes aligned with sosa:Sensor. Instances of these classes
+# are declared in instance data files alongside their sosa:observes,
+# wf:monitorsPort, and wf:attachedTo links.
+
+solar:PowerMeter a owl:Class ;
+    rdfs:subClassOf sosa:Sensor ;
+    rdfs:label "Power Meter" ;
+    rdfs:comment """
+        Measures instantaneous electrical power (kW) at a port or component.
+        Observable property: energy:ElectricalPower.
+        Instances: Grid_PowerMeter, Solar_PowerMeter, MBR_PowerMeter, RO_PowerMeter.
+        All PowerMeter observations carry energy:isMeasurementType:
+          Grid_PowerMeter   → 'Derived'
+          Solar_PowerMeter  → 'Measured'
+          MBR_PowerMeter    → 'Measured'
+          RO_PowerMeter     → 'Measured'
+    """ .
+
+solar:LoadSensor a owl:Class ;
+    rdfs:subClassOf sosa:Sensor ;
+    rdfs:label "Load Sensor" ;
+    rdfs:comment """
+        Measures the operating load fraction of a motor or blower (dimensionless, 0–1).
+        Observable property: energy:LoadFraction.
+        Instance: MBR_BlowerLoad sensor attached to MBR_AerationBlower.
+        Measurement type: Measured. Used as input to Pattern 1 derivation.
+    """ .
+
+solar:FlowSensor a owl:Class ;
+    rdfs:subClassOf sosa:Sensor ;
+    rdfs:label "Flow Sensor" ;
+    rdfs:comment """
+        Measures volumetric flow rate (m³/h).
+        Observable property: solar:FlowRate.
+        Instance: RO_FeedFlow sensor monitoring the RO inlet port.
+        Measurement type: Measured. Used as input to Pattern 2 derivation.
+        Note: flow (m³/h) × specificEnergy (kWh/m³) = power (kW).
+    """ .
+
+
+# =============================================================================
+# OBSERVABLE PROPERTIES
+# =============================================================================
+# Named individuals for sosa:observedProperty in instance data.
+# energy:ElectricalPower and energy:LoadFraction are defined in energy.ttl
+# and reused here. FlowRate is solar-domain specific.
+
+solar:FlowRate a owl:NamedIndividual ;
+    rdfs:label "Flow Rate" ;
+    rdfs:comment "Observable property: volumetric flow rate (m³/h). Observed by FlowSensor instances on feed water inlet ports." .
+
+
+# =============================================================================
+# DERIVATION PATTERN DOCUMENTATION
+# =============================================================================
+# These named individuals document the derivation rules as ontology resources.
+# SPARQL rules reference these to identify which observations are computed
+# and which inputs they require.
+
+solar:Pattern_MBR_Power a owl:NamedIndividual ;
+    rdfs:label "MBR Power Derivation Pattern" ;
+    rdfs:comment """
+        Pattern 1: MBR instantaneous power (kW)
+        Formula : MBR_power = ratedPower × BlowerLoad_fraction
+        Inputs  : solar:ratedPower on MBR_AerationBlower individual (qudt:QuantityValue, kW)
+                  sosa:Observation of energy:LoadFraction by MBR_BlowerLoad sensor
+        Output  : sosa:Observation of energy:ElectricalPower by MBR_PowerMeter
+                  energy:isMeasurementType = 'Derived' on computed observations,
+                  'Measured' on ground-truth MBR_PowerMeter observations
+        Verification: load_fraction × 1.6 kW = MBR_PowerMeter reading
+    """ .
+
+solar:Pattern_RO_Power a owl:NamedIndividual ;
+    rdfs:label "RO Power Derivation Pattern" ;
+    rdfs:comment """
+        Pattern 2: RO instantaneous power (kW)
+        Formula : RO_power = specificEnergy × FeedFlow
+        Inputs  : solar:specificEnergy on RO_HighPressurePump individual (qudt:QuantityValue, kWh/m³)
+                  sosa:Observation of solar:FlowRate by RO_FeedFlow sensor (m³/h)
+        Output  : sosa:Observation of energy:ElectricalPower by RO_PowerMeter
+                  energy:isMeasurementType = 'Derived' on computed observations,
+                  'Measured' on ground-truth RO_PowerMeter observations
+        Verification: flow_rate × 3.0 kWh/m³ = RO_PowerMeter reading
+    """ .
+
+solar:Pattern_Grid_Power a owl:NamedIndividual ;
+    rdfs:label "Grid Power Derivation Pattern" ;
+    rdfs:comment """
+        Pattern 3: Grid import power (kW)
+        Formula : Grid_power = MAX(0, MBR_power + RO_power - Solar_power)
+        Inputs  : MBR_PowerMeter observation (Measured or Pattern 1 Derived)
+                  RO_PowerMeter observation  (Measured or Pattern 2 Derived)
+                  Solar_PowerMeter observation (Measured)
+        Output  : sosa:Observation of energy:ElectricalPower by Grid_PowerMeter
+                  energy:isMeasurementType = 'Derived' always
+        Semantics: Grid supplies whatever on-site solar does not cover.
+                   Zero when solar generation exceeds total treatment demand.
+    """ .
+
+
+# =============================================================================
+# STANDARD SOLAR READING INDIVIDUALS
+# =============================================================================
+# Benchmark anchor individuals for solar generation and equipment ratings.
+# Hourly instance readings reference these via energy:isReadingOf.
+
+solar:Reading_SolarPV_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWatt ;
+    rdfs:label "Standard Solar PV Output Reading" ;
+    rdfs:comment "Anchor reading for solar PV generation observations (kW, hourly). Measured by Solar_PowerMeter." .
+
+solar:Reading_GridImport_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWatt ;
+    rdfs:label "Standard Grid Import Reading" ;
+    rdfs:comment "Anchor reading for grid import observations (kW, hourly). Derived: MBR + RO - Solar, floored at zero." .
+
+solar:Reading_MBR_Power_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWatt ;
+    rdfs:label "Standard MBR Power Reading" ;
+    rdfs:comment "Anchor reading for MBR unit power consumption (kW, hourly). Measured by MBR_PowerMeter; verifiable via Pattern 1." .
+
+solar:Reading_RO_Power_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWatt ;
+    rdfs:label "Standard RO Power Reading" ;
+    rdfs:comment "Anchor reading for RO unit power consumption (kW, hourly). Measured by RO_PowerMeter; verifiable via Pattern 2." .
+
+solar:Reading_BlowerLoad_Std a qudt:QuantityValue ;
+    qudt:unit unit:UNITLESS ;
+    rdfs:label "Standard Blower Load Fraction Reading" ;
+    rdfs:comment "Anchor reading for MBR blower load fraction (dimensionless 0–1, hourly). Measured by MBR_BlowerLoad sensor." .
+
+solar:Reading_ROFeedFlow_Std a qudt:QuantityValue ;
+    qudt:unit unit:CubicMeterPerHour ;
+    rdfs:label "Standard RO Feed Flow Reading" ;
+    rdfs:comment "Anchor reading for RO feed water flow rate (m³/h, hourly). Measured by RO_FeedFlow sensor." .

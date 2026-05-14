@@ -11,7 +11,7 @@
 @prefix quantity: <http://qudt.org/vocab/quantitykind/> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-
+# JD: That' a deprecated the old file right?
 # --------------SuperClass -----------------------------------------
 energysource:EnergySourceProcess a owl:Class ;
 rdfs:label "Energy Source Process " .

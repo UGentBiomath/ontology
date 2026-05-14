@@ -119,6 +119,10 @@ water:hasVariable a owl:ObjectProperty ;
     rdfs:label "has variable" ;
     rdfs:comment "Links a WaterProcess to one of its input variables used in energy calculation." .
 
+
+#JD: Here we have lot of properties that are similar (in that they allow you to compute energy demand for groundwater pumping and pipeline transport)
+# But they inherit directly from ObjectProperty. Do you think we could split them, maybe by what they are (eg parameters, variables, anything you think is relevant) aor what they are used for?
+
 water:hasLiftDistance a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has lift distance" .
@@ -513,6 +517,7 @@ water:WasteWaterPumping a owl:Class ;
 # hourly sosa:Observation values to process individuals referencing these
 # as their type template via energy:isReadingOf.
 
+# JD: you could have put the reading individuals and the restrictions below together (it would have made it a bit easire to understand the semantics of each named individual), but there is nothing technically wrong with this method.
 water:Reading_BoosterPumping_Std a qudt:QuantityValue ;
     qudt:unit unit:KiloWattHourPerCubicMeter ;
     rdfs:label "Standard Booster Pumping Reading" .

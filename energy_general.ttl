@@ -1,12 +1,12 @@
-@prefix energy:  <https://ugentbiomath.github.io/ontology/energy.ttl#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix qudt:    <http://qudt.org/schema/qudt/> .
-@prefix unit:    <http://qudt.org/vocab/unit/> .
-@prefix sosa:    <http://www.w3.org/ns/sosa/> .
-
+@prefix : <workspace:///energy_general.ttl#> .
+@prefix energy: <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 # =============================================================================
 # ONTOLOGY DECLARATION
@@ -68,7 +68,7 @@ energy:EnergySource a owl:Class ;
     """ .
 
 # --- Carrier type (what form the energy takes) ---
-
+# JD: Would be nice to convert these to ObjectProperty
 energy:hasEnergyCarrier a owl:DatatypeProperty ;
     rdfs:domain energy:EnergySource ;
     rdfs:range xsd:string ;
@@ -209,6 +209,7 @@ energy:EnergyDemand a owl:Class ;
           - Grid balancing (derived: grid draws what solar does not cover)
     """ .
 
+# JD: The demand types could also be object properties
 energy:hasDemandType a owl:DatatypeProperty ;
     rdfs:domain energy:EnergyDemand ;
     rdfs:range xsd:string ;
@@ -221,6 +222,7 @@ energy:hasDemandMagnitude a owl:ObjectProperty ;
     rdfs:label "has demand magnitude" ;
     rdfs:comment "The quantity of energy required to satisfy the demand (kWh or kW)." .
 
+# JD: The demand frequencies could also be object properties
 energy:hasDemandFrequency a owl:DatatypeProperty ;
     rdfs:domain energy:EnergyDemand ;
     rdfs:range xsd:string ;
@@ -266,6 +268,43 @@ energy:EnergyConsumption a owl:Class ;
           - solar:SolarEnergyConsumption  (solar_energy.ttl)
     """ .
 
+# JD: these two classes could be made into "smart classes" that use reasoning if you declared equivalentClass conditions. For instance, here is a system class:
+# wf:System
+#    a owl:Class ;
+#    rdfs:subClassOf wf:MaterialEntity ;
+#    rdfs:subClassOf <http://purl.obolibrary.org/obo/RO_0002577> ; #OBO's system class
+#    owl:equivalentClass [
+#        rdf:type owl:Class ;
+#        owl:intersectionOf (
+#            wf:MaterialEntity
+#            [ a owl:Restriction ; owl:onProperty wf:hasPart ; owl:someValuesFrom wf:MaterialEntity ]
+#            [ a owl:Restriction ; owl:onProperty wf:enacts; owl:someValuesFrom wf:Process]
+#        )
+#    ] ;
+#    rdfs:label "System"@en ;
+#    rdfs:comment "A system is defined as an interconnected set of elements that is coherently organized in a way that achieves something, consisting of three components: elements, interconnections, and a function or purpose. (Meadows, 2008)."@en .
+# This can be read as: A system is a kind of material entity (subclass Of)
+# If a material entity object:
+#    1. is connected to another MaterialEntity object with the wf:hasPart propoerty AND 
+#    2. it is connected to a Process object with the wf:enacts property,
+# Then it is *automatically also a system* (without need the "entity a wf:System" to be written down)
+# Here, we could imagine the same for your Energy consumption class, ie:
+# ElectricalEnergyConsumption is equivalentTo an EnergyConsumption that is hasEnergyCarrierType ElectricalPower (or something like that using your exact classes)
+
+# Another pattern you could start using is the owl:disjointWith pattern for categorical classes
+# Say you have a class :PlayingCard and you want to say that the sort can be either Hearts, Clubs, Diamonds or Spades.
+# Then you declare the class
+# :Card a owl:Class
+# the property 
+# :hasSuit a owl:ObjectProperty
+# rdfs:domain :Card
+# rdfs:range :Suit
+#:Suit rdf:type owl:Class ;
+#      owl:equivalentClass [ 
+#          owl:oneOf ( :Clubs :Diamonds :Hearts :Spades ) 
+#      ] .
+
+
 energy:ElectricalEnergyConsumption a owl:Class ;
     rdfs:subClassOf energy:EnergyConsumption ;
     rdfs:label "Electrical Energy Consumption" ;
@@ -310,6 +349,7 @@ energy:drawnFromSource a owl:ObjectProperty ;
 
 # --- Reading link (for hourly/timestamped instance data) ---
 
+# JD: This is an object property, but what objects should be in the range and the domain?
 energy:isReadingOf a owl:ObjectProperty ;
     rdfs:label "is reading of" ;
     rdfs:comment """
@@ -320,7 +360,7 @@ energy:isReadingOf a owl:ObjectProperty ;
     """ .
 
 # --- Measurement type (measured directly vs derived from inputs) ---
-
+# JD: That also could be an object property
 energy:isMeasurementType a owl:DatatypeProperty ;
     rdfs:label "is measurement type" ;
     rdfs:comment """
@@ -328,7 +368,7 @@ energy:isMeasurementType a owl:DatatypeProperty ;
           'Measured'  — directly observed by a sensor (e.g. Solar_PowerMeter, MBR_PowerMeter)
           'Derived'   — computed from other measured inputs
                         (e.g. Grid power = MBR power + RO power - Solar power;
-                              MBR power  = ratedPower × BlowerLoad fraction;
+                              MBR power  = ratedPower × BlowerLoad fraction; # JD: Looks like the x is not a standard ascii character. It might not render well on everycomputer, replace with normal x
                               RO power   = specificEnergy × FeedFlow)
         SPARQL queries use this flag to decide whether to read a value directly
         or compute it from its inputs.
@@ -337,6 +377,7 @@ energy:isMeasurementType a owl:DatatypeProperty ;
 
 # --- Inverse declaration ---
 
+# JD: isn't inverseOf a preexisting owl object? Why redefine it?
 owl:inverseOf a owl:ObjectProperty .
 energy:resultsIn owl:inverseOf energy:causedByDemand .
 
@@ -347,6 +388,7 @@ energy:resultsIn owl:inverseOf energy:causedByDemand .
 # Named individuals for sosa:observedProperty links in instance data.
 # Domain extension files add further observable property individuals.
 
+# JD: check if these named individuals should be disjoint from others to form a category (like the card suits example)
 energy:ElectricalPower a owl:NamedIndividual ;
     rdfs:label "Electrical Power" ;
     rdfs:comment "Observable property: instantaneous electrical power (kW). Used by PowerMeter sensors." .

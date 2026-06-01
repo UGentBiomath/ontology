@@ -1,868 +1,410 @@
-@prefix energysource:<https://ugentbiomath.github.io/ontology/energy.ttl#> .
-@prefix wf: <https://ugentbiomath.github.io/waterframe#> .
-@prefix housecase1: <https://ugentbiomath.github.io/ontology/index.ttl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix time: <http://www.w3.org/2006/time#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix qudt: <http://qudt.org/schema/qudt/> .
-@prefix unit: <http://qudt.org/vocab/unit/> .
-@prefix quantity: <http://qudt.org/vocab/quantitykind/> .
-@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix energy:  <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix qudt:    <http://qudt.org/schema/qudt/> .
+@prefix unit:    <http://qudt.org/vocab/unit/> .
+@prefix sosa:    <http://www.w3.org/ns/sosa/> .
 
 
-# --------------SuperClass -----------------------------------------
-energysource:EnergySourceProcess a owl:Class ;
-rdfs:label "Energy Source Process " .
-#----------------Classes --------------------------------
-energysource:WaterConveyance a owl:Class;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Water Conveyance".
+# =============================================================================
+# ONTOLOGY DECLARATION
+# =============================================================================
 
-energysource:WaterTreatment a owl:Class;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Water Treatment".
+<https://ugentbiomath.github.io/ontology/energy.ttl>
+    a owl:Ontology ;
+    rdfs:label "Energy Framework Ontology" ;
+    rdfs:comment """
+        General foundational framework for modelling energy sources, energy demand,
+        and energy consumption. This file is domain-agnostic — it defines the core
+        concepts and relationships that any domain-specific extension must build upon.
 
-energysource:WaterDistribution a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Water Distribution".
+        DESIGN PRINCIPLE:
+        The use of an EnergySource creates an EnergyDemand. Satisfying that demand
+        results in EnergyConsumption as a measurable by-product. This causal chain
+        is the backbone of the framework:
 
-energysource:WasteWaterCollection a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Waste Water Collection".
+            EnergySource → exploited to meet → EnergyDemand
+                                                    └── results in → EnergyConsumption
 
-energysource:WasteWaterTreatment a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Waste Water Treatment".
+        DOMAIN EXTENSIONS (import this file and subclass EnergyConsumption):
+          - water_energy.ttl : water and wastewater treatment processes
+                               <https://ugentbiomath.github.io/ontology/water_energy.ttl>
+          - solar_energy.ttl : solar PV systems and household energy components
+                               <https://ugentbiomath.github.io/ontology/solar_energy.ttl>
 
-energysource:WasteWaterDischarge a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label " Waste Water Discharge".
+        INSTANCE DATA:
+          Domain-specific instance files import the relevant extension ontology and
+          use sosa:Observation to record timestamped energy readings. The framework
+          supports both directly measured and derived values via energy:isMeasurementType.
 
-energysource:RecycledWasteWaterTreatment a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Recycled Waste Water Treatment" .
+        OUT OF SCOPE FOR THIS FILE:
+          - Emission intensity and carbon accounting
+          - Energy efficiency and conversion losses
+          - Domain-specific process classes (defined in extension files)
+    """ ;
+    rdfs:seeAlso
+        <https://ugentbiomath.github.io/ontology/water_energy.ttl> ,
+        <https://ugentbiomath.github.io/ontology/solar_energy.ttl> .
 
-energysource:RecycledWaterDistribution a owl:Class ;
-rdfs:subClassOf energysource:EnergySourceProcess;
-rdfs:label "Recycled Water Distribution" .
 
-energysource:GroundWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Ground Water Pumping (Water Conveyance)" .
+# =============================================================================
+# TIER 1 — ENERGY SOURCE
+# =============================================================================
+# An EnergySource is any entity that supplies energy.
+# It is the superior class. Everything downstream is a consequence of
+# exploiting it. The USE of an EnergySource creates an EnergyDemand,
+# which in turn results in EnergyConsumption.
 
-energysource:SurfaceWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterConveyance ;
-rdfs:label "Surface Water Pumping (Water Conveyance)" .
+energy:EnergySource a owl:Class ;
+    rdfs:label "Energy Source" ;
+    rdfs:comment """
+        Any natural or processed entity capable of supplying energy to perform work.
+        Superior class of the framework. Subclasses represent specific source types
+        (renewable, fossil, secondary). Domain extension files introduce source
+        individuals (e.g. a rooftop solar PV array, a grid connection) as instances
+        of the appropriate subclass.
+    """ .
 
-energysource:SurfaceWaterPumping_Normal a owl:Class;
-rdfs:subClassOf energysource:SurfaceWaterPumping ;
-rdfs:label "Normal Surface Water Pumping (Water Conveyance)" .
+# --- Carrier type (what form the energy takes) ---
 
-energysource:SurfaceWaterPumping_Gravity a owl:Class;
-rdfs:subClassOf energysource:SurfaceWaterPumping ;
-rdfs:label "Gravity driven Surface Water Pumping (Water Conveyance)" .
+# 1. Define the class for energy carriers
 
-energysource:Chlorination a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Chlorination" .
+energy:EnergyCarrier a owl:Class ;
+    rdfs:label "Energy Carrier" ;
+    rdfs:comment "The physical form in which energy is stored or delivered." .
 
-energysource:CoagulantFeeding a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Coagulant Feeding" .
+# 2. Define the individuals (instances) of that class.
 
-energysource:RapidMixing a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Rapid Mixing" .
+energy:Electrical a energy:EnergyCarrier ; rdfs:label "Electrical" .
+energy:Thermal    a energy:EnergyCarrier ; rdfs:label "Thermal" .
+energy:Chemical   a energy:EnergyCarrier ; rdfs:label "Chemical" .
+energy:Mechanical a energy:EnergyCarrier ; rdfs:label "Mechanical" .
 
-energysource:Flocculation a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Flocculation" .
 
-energysource:Sedimentation a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Sedimentation" .
+# 3. Define the Object Property pointing to the class
+energy:hasEnergyCarrier a owl:ObjectProperty ;
+    rdfs:domain energy:EnergySource ;
+    rdfs:range energy:EnergyCarrier ;
+    rdfs:label "has energy carrier" ;
+    rdfs:comment "The physical form in which the source delivers energy: Electrical, Thermal, Chemical, or Mechanical." .
 
-energysource:GravityFiltration a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Gravity Filtration" .
+# --- Origin type (primary from nature vs secondary/converted) ---
 
-energysource:HydraulicSurfaceWashing a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Hydraulic Surface Washing" .
+energy:hasOriginType a owl:DatatypeProperty ;
+    rdfs:domain energy:EnergySource ;
+    rdfs:range xsd:string ;
+    rdfs:label "has origin type" ;
+    rdfs:comment "Whether the source is Primary (directly from nature) or Secondary (converted from a primary source)." .
 
-energysource:ReverseOsmosis a owl:Class;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " Reverse Osmosis" .
+# --- Renewability ---
 
-energysource:SeaWaterReverseOsmosis a owl:Class;
-rdfs:subClassOf energysource:ReverseOsmosis ;
-rdfs:label " Sea Water Reverse Osmosis".
+energy:hasRenewabilityStatus a owl:DatatypeProperty ;
+    rdfs:domain energy:EnergySource ;
+    rdfs:range xsd:string ;
+    rdfs:label "has renewability status" ;
+    rdfs:comment "Renewable, Non-renewable, or Partially-renewable." .
 
-energysource:BrackishWaterReverseOsmosis a owl:Class;
-rdfs:subClassOf energysource:ReverseOsmosis ;
-rdfs:label "Brackish Water Reverse Osomosis".
+# --- Availability profile ---
 
-energysource:MSF a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MSF Desalination (Water Treatment)" .
+energy:hasAvailabilityProfile a owl:DatatypeProperty ;
+    rdfs:domain energy:EnergySource ;
+    rdfs:range xsd:string ;
+    rdfs:label "has availability profile" ;
+    rdfs:comment "Continuous (always available), Intermittent (weather-dependent), or Dispatchable (controllable on demand)." .
 
-energysource:MED a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MED Desalination (Water Treatment)" .
+# --- Energy reading (hourly or timestamped supply measurement) ---
 
-energysource:MVC a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label " MVC Desalination (Water Treatment)" .
-
-energysource:BackWashPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Back Wash Pumping" .
-
-energysource:InPlantPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "In-Plant Pumping" .
-
-energysource:ChlorineFeeding a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Chlorine Feeding" .
-
-energysource:HighServicePumping a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "High Service Pumping" .
-
-energysource:WellPumping a owl:Class ;
-rdfs:subClassOf energysource:GroundWaterPumping ;
-rdfs:label "Well Pumping" .
-
-energysource:BoosterPumping a owl:Class ;
-rdfs:subClassOf energysource:GroundWaterPumping ;
-rdfs:label "Booster Pumping" .
-
-energysource:SurfaceWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Surface Water Chlorination and Dechlorination" .
-
-energysource:GroundWaterChlorinationandDechlorination a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Ground Water Chlorination and Dechlorination" .
-
-energysource:UVIrradiation a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment;
-rdfs:label "UV Irradiation" .
-
-energysource:Ozone a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "Ozone" .
-
-energysource:HydraCAP60 a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment ;
-rdfs:label "HydraCAP 60" .
-
-energysource:MicroFiltration a owl:Class ;
-rdfs:subClassOf energysource:WaterTreatment;
-rdfs:label "Microfiltration" .
-
-energysource:Lagoons a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Lagoons" .
-
-energysource:ActivatedSludge a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Activated Sludge" .
-
-energysource:OxidationDitch a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Oxidation Ditch" .
-
-energysource:MembraneBio_Reactors a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment;
-rdfs:label "Membrane Bio Reactors" . 
-
-energysource:Trickling a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Trickling" .
-
-energysource:AdvancedWaterTreatment a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Advanced Water Treatment" .
-
-energysource:WasteWaterPumping a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label " Waste Water Pumping" .
-
-energysource:AeratedGritRemoval a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "AeratedGritRemoval" .
-
-energysource:PrimaryClarifiers a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Primary Clarifiers" .
-
-energysource:Aeration a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Aeration" .
-
-energysource:ReturnSludgePumping a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Return Sludge Pumping" .
-
-energysource:SecondaryClarifiers a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Secondary Clarifiers" .
-
-energysource:Digestion a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Digestion" .
-
-energysource:Dewatering a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Dewatering" .
-
-energysource:ChemicalAddition a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Chemical Addition" .
-
-energysource:FilterFeedPumping a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Filter Feed Pumping" .
-
-energysource:Filtration a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Filtration" .
-
-energysource:BiologicalNitrification a owl:Class ;
-rdfs:subClassOf energysource:WasteWaterTreatment ;
-rdfs:label "Biological Nitrification" .
-
-energysource:DistributionPumping a owl:Class ;
-rdfs:subClassOf energysource:WaterDistribution ;
-rdfs:label " Distribution Pumping Water Distribution" .
-
-#-----------------Properties of Energy Consumption ---------------
-# This is a template for an Energy Reading. It has no value, only a unit.
-energysource:hasEnergyConsumption a owl:ObjectProperty ;
-rdfs:domain energysource:EnergySourceProcess ;
-rdfs:range qudt:QuantityValue ;
-rdfs:label "has Energy Consumption" .
-    
-
-energysource:hasElectricalEnergyConsumption a owl:ObjectProperty ;
-    rdfs:subPropertyOf energysource:hasEnergyConsumption ;
-    rdfs:domain energysource:EnergySourceProcess ;
+energy:hasEnergyReading a owl:ObjectProperty ;
+    rdfs:domain energy:EnergySource ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Electrical Energy Consumption" .
+    rdfs:label "has energy reading" ;
+    rdfs:comment """
+        Links an EnergySource individual to a timestamped supply reading
+        (a qudt:QuantityValue carrying a sosa:resultTime and sosa:hasSimpleResult).
+        Used by domain extension files to record hourly generation values
+        (e.g. solar PV output in kW per hour).
+    """ .
 
-energysource:hasThermalEnergyConsumption a owl:ObjectProperty ;
-    rdfs:subPropertyOf energysource:hasEnergyConsumption ;
-    rdfs:domain energysource:EnergySourceProcess ;
+# =============================================================================
+# TIER 1 SUBCLASSES — What constitutes an EnergySource
+# =============================================================================
+
+energy:RenewableEnergySource a owl:Class ;
+    rdfs:subClassOf energy:EnergySource ;
+    rdfs:label "Renewable Energy Source" ;
+    rdfs:comment "An energy source replenished naturally on human timescales. Availability is typically Intermittent or Continuous." .
+
+energy:SolarEnergy a owl:Class ;
+    rdfs:subClassOf energy:RenewableEnergySource ;
+    rdfs:label "Solar Energy" ;
+    rdfs:comment "Energy derived from solar irradiance. Carrier: Electrical (PV) or Thermal (solar thermal)." .
+
+energy:WindEnergy a owl:Class ;
+    rdfs:subClassOf energy:RenewableEnergySource ;
+    rdfs:label "Wind Energy" ;
+    rdfs:comment "Energy derived from wind via turbines. Carrier: Electrical." .
+
+energy:HydroEnergy a owl:Class ;
+    rdfs:subClassOf energy:RenewableEnergySource ;
+    rdfs:label "Hydro Energy" ;
+    rdfs:comment "Energy derived from flowing or falling water. Carrier: Electrical." .
+
+energy:GeothermalEnergy a owl:Class ;
+    rdfs:subClassOf energy:RenewableEnergySource ;
+    rdfs:label "Geothermal Energy" ;
+    rdfs:comment "Energy derived from heat within the earth. Carrier: Thermal or Electrical." .
+
+energy:BiomassEnergy a owl:Class ;
+    rdfs:subClassOf energy:RenewableEnergySource ;
+    rdfs:label "Biomass Energy" ;
+    rdfs:comment "Energy derived from organic matter. Carrier: Chemical or Thermal." .
+
+energy:FossilFuelSource a owl:Class ;
+    rdfs:subClassOf energy:EnergySource ;
+    rdfs:label "Fossil Fuel Source" ;
+    rdfs:comment "Finite carbon-based fuels formed over geological time. Origin: Primary, Non-renewable." .
+
+energy:NaturalGas a owl:Class ;
+    rdfs:subClassOf energy:FossilFuelSource ;
+    rdfs:label "Natural Gas" ;
+    rdfs:comment "Fossil fuel. Carrier: Chemical (combustion) or converted to Thermal/Electrical." .
+
+energy:Diesel a owl:Class ;
+    rdfs:subClassOf energy:FossilFuelSource ;
+    rdfs:label "Diesel" ;
+    rdfs:comment "Fossil fuel. Carrier: Chemical (combustion). Used in generators and engines." .
+
+energy:Coal a owl:Class ;
+    rdfs:subClassOf energy:FossilFuelSource ;
+    rdfs:label "Coal" ;
+    rdfs:comment "Fossil fuel. Carrier: Chemical (combustion) or converted to Electrical." .
+
+energy:SecondaryEnergySource a owl:Class ;
+    rdfs:subClassOf energy:EnergySource ;
+    rdfs:label "Secondary Energy Source" ;
+    rdfs:comment "Energy converted from a primary source and carried to the point of use. Origin: Secondary." .
+
+energy:ElectricityGrid a owl:Class ;
+    rdfs:subClassOf energy:SecondaryEnergySource ;
+    rdfs:label "Electricity Grid" ;
+    rdfs:comment "Public or private electrical distribution network. Carrier: Electrical. Availability: Continuous. Grid power drawn is the balance of total demand minus on-site generation (e.g. solar)." .
+
+energy:ThermalSource a owl:Class ;
+    rdfs:subClassOf energy:SecondaryEnergySource ;
+    rdfs:label "Thermal Source" ;
+    rdfs:comment "Heat energy supplied via district heating or steam networks. Carrier: Thermal." .
+
+
+# =============================================================================
+# TIER 2 — ENERGY DEMAND
+# =============================================================================
+# EnergyDemand is the causal bridge between EnergySource and EnergyConsumption.
+# It is the NEED that justifies drawing from a source.
+# Without demand there is no exploitation; without exploitation there is no consumption.
+# This class answers the fundamental question: WHY is energy being used at all?
+
+energy:EnergyDemand a owl:Class ;
+    rdfs:label "Energy Demand" ;
+    rdfs:comment """
+        The need that drives the exploitation of an EnergySource. Represents the
+        type and magnitude of work required by a process or system. EnergyDemand
+        is the causal link — it explains WHY energy is drawn from a source and
+        WHY consumption occurs as a result.
+
+        Demand types in the water domain:
+          - Mechanical work  (pumping, mixing, aeration)
+          - Chemical transformation (dosing, disinfection)
+          - Thermal transformation (desalination, heating)
+          - Electrochemical (UV, electrolysis)
+
+        Demand types in the solar domain:
+          - Electrical supply to treatment equipment
+          - Grid balancing (derived: grid draws what solar does not cover)
+    """ .
+
+# 2. Define the individuals (instances) of that class belonging to the Standard Demand Types
+energy:Mechanical     a energy:DemandType ; rdfs:label "Mechanical" .
+energy:Chemical       a energy:DemandType ; rdfs:label "Chemical" .
+energy:Thermal        a energy:DemandType ; rdfs:label "Thermal" .
+energy:Electrochemical a energy:DemandType ; rdfs:label "Electrochemical" .
+energy:GridBalancing  a energy:DemandType ; rdfs:label "Grid Balancing" .
+
+# 3. Define the individuals (instances) of that class belonging to the Standard Demand Frequencies
+energy:Continuous a energy:DemandFrequency ; rdfs:label "Continuous" .
+energy:Batch      a energy:DemandFrequency ; rdfs:label "Batch" .
+energy:Peak       a energy:DemandFrequency ; rdfs:label "Peak" .
+energy:hasDemandType a owl:ObjectProperty ;
+    rdfs:domain energy:EnergyDemand ;
+    rdfs:range energy:DemandType ;
+    rdfs:label "has demand type" ;
+    rdfs:comment "Type of work the demand represents: Mechanical, Chemical, Thermal, or Electrochemical." .
+
+energy:hasDemandMagnitude a owl:ObjectProperty ;
+    rdfs:domain energy:EnergyDemand ;
     rdfs:range qudt:QuantityValue ;
-    rdfs:label "has Thermal Energy Consumption" .
-
-#-----------Properties of Variables-------------------
-# Variables
-energysource:hasVariable a owl:ObjectProperty ;
-    rdfs:domain energysource:EnergySourceProcess ;
-    rdfs:range qudt:QuantityValue .
-
-energysource:hasLiftDistance a owl:ObjectProperty;
-rdfs:subPropertyOf energysource:hasVariable ;
-rdfs:label "Lift Distance (l)" .
-
-energysource:hasFlowVolume a owl:ObjectProperty ; 
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasPressureRequirement a owl:ObjectProperty ; 
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasTime a owl:ObjectProperty ; 
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasLengthOfPipeline a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasCrossSectionArea a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasHazenWilliamsCoefficient a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasSlope a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasAge a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasChannelLength a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasConstantSpecificToMaterial a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasSoilPermeability a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasBedSlope a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasFrictionalandVegetativeResistance a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasEvapotranspirationRate a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-energysource:hasPrecipitationRate a owl:ObjectProperty ;
-rdfs:subPropertyOf energysource:hasVariable .
-
-#---------Energy Consumption Reading Silos-------------------
-energysource:Reading_Filtration_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Filtration Reading" .
-    
-    energysource:Reading_DistributionPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Distribution Pumping Reading" .
-
-energysource:Reading_BoosterPumping_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Booster Pump Reading" .
-
-energysource:Reading_Chlorination_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Chlorination Reading" .
-
-energysource:Reading_SurfaceWaterChlorandDechlor_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Surface Water Chlorination and Dechlorination Reading" .
-
-energysource:Reading_GroundWaterChlorandDechlor_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Ground Water Chlorination and Dechlorination Reading" .
-
-energysource:Reading_UVIrradiation_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard UV Irradiation Reading" .
-
-energysource:Reading_Ozone_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Ozone Reading" .
-
-energysource:Reading_HydraCAP60_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard HydraCAP 60 Reading" .
-
-energysource:Reading_MicroFiltration_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Microfiltration Reading" .
-
-energysource:Reading_MSF_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard MSF Reading" .
-
-energysource:Reading_MVC_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard MVC Reading" .
-
-energysource:Reading_MED_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard MED Reading" .
-
-energysource:Reading_SeaWater_ReverseOsmosis_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Sea Water Reverse Osmosis Reading" .
-
-energysource:Reading_Brackish_ReverseOsmosis_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Brackish Reverse Osmosis Reading" .
-
-energysource:Reading_Lagoons_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Lagoons Reading" .
-
-energysource:Reading_WasteWaterTreatment_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Waste Water Treatment Reading" .
-
-energysource:Reading_OxidationDitch_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Oxidation Ditch Reading" .
-
-energysource:Reading_MembraneBioReac_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Membrane Bio Reactor Reading" .
-
-energysource:Reading_Coagulant_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Coagulant Feeding Reading" .
-
-energysource:Reading_RapidMixing_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Rapid Mixing Reading" .
-
-energysource:Reading_Flocculation_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Flocculation Reading" .
-
-energysource:Reading_Sedimentation_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Sedimentation Reading" .
-
-energysource:Reading_HydraulicSurfaceWash_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Hydraulic Surface Wash Reading" .
-
-energysource:Reading_GravityFiltration_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Gravity Filtration Reading" .
-
-energysource:Reading_BackWash_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Back Washing Pumping Reading" .
-
-energysource:Reading_InPlant_Pumping_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard In Planty Pump Reading" .
-
-energysource:Reading_ChlorineFeeding_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Chlorine Feeding Reading" .
-
-energysource:Reading_HighServicePumping_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard High Service Pump Reading" .
-
-energysource:Reading_WellPumping_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Well Pumping Reading" .
-
-energysource:Reading_WasteWaterPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Waste Water Pumping Reading" .
-
-energysource:Reading_Aeration_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Aeration Reading" .
-
-energysource:Reading_AeratedGrit_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Aerated Grit Removal Reading" .
-
-energysource:Reading_PrimaryClarifiers_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Primary Clarifiers Reading" .
-
-energysource:Reading_ReturnSludgePump_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Return Sludge Pumping Reading" .
-
-energysource:Reading_SecondaryClarifiers_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Secondary Clarifiers Reading" .
-
-energysource:Reading_Digestion_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Digestion Reading" .
-
-energysource:Reading_Dewatering_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Dewatering Reading" .
-
-energysource:Reading_ChemicalAddition_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Chemical Addition Reading" .
-
-energysource:Reading_FilterFeedPump_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Filter Feed Pump Reading" .
-
-energysource:Reading_BiologicalNitrification_Std a qudt:QuantityValue ;
-qudt:unit unit:KiloWattHourPerCubicMeter ;
-rdfs:label "Standard Biological Nitrification Reading" .
-
-#---------Energy Consumption--------------------------
-energysource:Filtration rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Filtration_Std
-] ;
-rdfs:label "Filtration Process" .
-
-energysource:BoosterPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_BoosterPumping_Std
-] ;
-rdfs:label "Booster Pumping Process" .
-
-energysource:Chlorination rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Chlorination_Std
-] ;
-rdfs:label "Chlorination Process" .
-
-energysource:SurfaceWaterChlorinationandDechlorination rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_SurfaceWaterChlorandDechlor_Std
-] ;
-rdfs:label "Surface Water Chlorination & Dechlorination Process" .
-
-energysource:GroundWaterChlorinationandDechlorination rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_GroundWaterChlorandDechlor_Std
-] ;
-rdfs:label "Ground Water Chlorination & Dechlorination Process" .
-
-energysource:Ozone rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Ozone_Std
-] ;
-rdfs:label "Ozone Process" .
-
-energysource:HydraCAP60 rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_HydraCAP60_Std
-] ;
-rdfs:label "HydraCAP 60 Process" .
-
-energysource:MicroFiltration rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Microfiltration_Std
-] ;
-rdfs:label "Microfiltration Process" .
-
-energysource:MSF rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MSF_Std
-] ;
-rdfs:label "MSF Process" .
-
-energysource:MED rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MED_Std
-] ;
-rdfs:label "MED Process" .
-
-energysource:MVC rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MVC_Std
-] ;
-rdfs:label "MVC Process" .
-
-energysource:ReverseOsmosis rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MembraneBioReac_Std
-] ;
-rdfs:label "Reverse Osomosis Process" .
-
-energysource:SeaWaterReverseOsmosis rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_SeaWater_ReverseOsomosis_Std
-] ;
-rdfs:label "Sea Water Reverse Osmosis Process" .
-
-energysource:BrackishWaterReverseOsmosis rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Brackish_ReverseOsomosis_Std
-] ;
-rdfs:label "Brackish Water Reverse Osmosis Process" .
-
-energysource:Lagoons rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Lagoons_Std
-] ;
-rdfs:label "Lagoons Process" .
-
-energysource:WasteWaterTreatment rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_WasteWaterTreatment_Std
-] ;
-rdfs:label "Waste Water Treatment Process" .
-
-energysource:OxidationDitch rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_OxidationDitch_Std
-] ;
-rdfs:label "Oxidation Ditch Process" .
-
-energysource:MembraneBio_Reactors rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_MembraneBioReac_Std
-] ;
-rdfs:label "Membrane Bio Reactor Process" .
-
-energysource:CoagulantFeeding rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Coagulant_Std
-] ;
-rdfs:label "Coagulant Feeding Process" .
-
-energysource:RapidMixing rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_RapidMixing_Std
-] ;
-rdfs:label "Rapid Mixing Process" .
-
-energysource:Flocculation rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Flocculation_Std
-] ;
-rdfs:label "Flocculation Process" .
-
-energysource:Sedimentation rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Sedimentation_Std
-] ;
-rdfs:label "Sedimentation Process" .
-
-energysource:HydraulicSurfaceWashing rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_HydraulicSurfaceWash_Std
-] ;
-rdfs:label "Hydraulic Surface Washing Process" .
-
-energysource:GravityFiltration rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_GravityFiltration_Std
-] ;
-rdfs:label "Gravity Filtration Process" .
-
-energysource:BackWashPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_BackWash_Std
-] ;
-rdfs:label "Backwash Pumping Process" .
-
-energysource:InPlantPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_InPlant_Pumping_Std
-] ;
-rdfs:label "In-Plant Pumping Process" .
-
-energysource:ChlorineFeeding rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_ChlorineFeeding_Std
-] ;
-rdfs:label "Chlorine Feeding Process" .
-
-energysource:HighServicePumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_HighServicePumping_Std
-] ;
-rdfs:label "High Service Pump Process" .
-
-energysource:WellPump rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_WellPump_Std
-] ;
-rdfs:label "Well Pump Process" .
-
-energysource:WasteWaterPump rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_WasteWaterPump_Std
-] ;
-rdfs:label "Waste Water Pump Process" .
-
-energysource:Aeration rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Aeration_Std
-] ;
-rdfs:label "Aeration Process" .
-
-energysource:AeratedGritRemoval rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_AeratedGrit_Std
-] ;
-rdfs:label "Aerated Grit Removal Process" .
-
-energysource:PrimaryClarifiers rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_PrimaryClarifiers_Std
-] ;
-rdfs:label "Primary Clarifiers Process" .
-
-energysource:ReturnSludgePump rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_ReturnSludgePump_Std
-] ;
-rdfs:label "Return Sludge Pump Process" .
-
-energysource:SecondaryClarifiers rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_SecondaryClarifiers_Std
-] ;
-rdfs:label "Secondary Clarifiers Process" .
-
-energysource:Digestion rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Digestion_Std
-] ;
-rdfs:label "Digestion Process" .
-
-energysource:Dewatering rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_Dewatering_Std
-] ;
-rdfs:label "Dewatering Process" .
-
-energysource:ChemicalAddition rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_ChemicalAddition_Std
-] ;
-rdfs:label "Chemical Addition Process" .
-
-energysource:FilterFeedPump rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_FilterFeedPump_Std
-] ;
-rdfs:label "Filter Feed Pump Process" .
-
-energysource:BiologicalNitrification rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_BiologicalNitrification_Std
-] ;
-rdfs:label "Biological Nitrification Process" .
-
-energysource:DistributionPumping rdfs:subClassOf [
-    a owl:Restriction ;
-    owl:onProperty energysource:hasEnergyConsumption ;
-    owl:hasValue energysource:Reading_DistributionPumping_Std
-] ;
-rdfs:label "Biological Nitrification Process" .
-#----------------------Restrictions-----------------------------------
-energysource:GroundWaterPumping
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasLiftDistance ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION: Must have at least one Flow Volume
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasFlowVolume ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION: Must have at least one Pressure Requirement
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasPressureRequirement ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION: Must have at least one Time variable
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasTime ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] .
-    # RESTRICTION : Must have length of Pipeline
-    energysource:SurfaceWaterPumping_Normal
-     rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasLengthOfPipeline ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Cross Section Area
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasCrossSectionArea ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Hazen Williams Coefficient
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasHazenWilliamsCoefficient ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have slope
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasSlope ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Age
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasAge ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] .
-    # RESTRICTION : Must have Channel Length
-    energysource:SurfaceWaterPumping_Gravity
- rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasChannelLength ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Constant Specific to Material
-     rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasConstantSpecificToMaterial ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Soil Permeability
-     rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasSoilPermeability ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRICTION : Must have Bed Slope
-     rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasBedSlope ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRCITION : Must have Frictional and Vegetative Resistance
-     rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasFrictionalandVegetativeResistance ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRCITION : Must have Evaporation Transpiration Rate
-      rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasEvapotranspirationRate ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] ;
-    # RESTRCITION : Must have Precipitation Rate
-    rdfs:subClassOf [ 
-        a owl:Restriction ; 
-        owl:onProperty energysource:hasPrecipitationRate ; 
-        owl:someValuesFrom qudt:QuantityValue 
-    ] .
+    rdfs:label "has demand magnitude" ;
+    rdfs:comment "The quantity of energy required to satisfy the demand (kWh or kW)." .
+energy:hasDemandFrequency a owl:ObjectProperty ;
+    rdfs:domain energy:EnergyDemand ;
+    rdfs:range energy:DemandFrequency ;
+    rdfs:label "has demand frequency" ;
+    rdfs:comment "Whether the demand is Continuous, Batch, or Peak." .
+
+energy:isMetBy a owl:ObjectProperty ;
+    rdfs:domain energy:EnergyDemand ;
+    rdfs:range energy:EnergySource ;
+    rdfs:label "is met by" ;
+    rdfs:comment "Links an EnergyDemand to the EnergySource that supplies it." .
+
+    # =============================================================================
+    # TIER 3 — ENERGY CONSUMPTION
+    # =============================================================================
+    # EnergyConsumption is the measurable by-product of satisfying an EnergyDemand
+    # by drawing from an EnergySource. It is not an independent phenomenon —
+    # it is caused by demand and traceable back to a source.
+    #
+    # DOMAIN EXTENSION PATTERN:
+    #   To add a new consumption domain, create a new file that:
+    #     (1) imports this file via owl:imports
+    #     (2) declares a subclass of energy:EnergyConsumption
+    #     (3) defines domain-specific process classes and reading individuals
+    #
+    #   Example:
+    #     my_domain:MyEnergyConsumption rdfs:subClassOf energy:EnergyConsumption .
+
+    energy:EnergyConsumption a owl:Class ;
+        rdfs:label "Energy Consumption" ;
+        rdfs:comment """
+            The measurable quantity of energy drawn from an EnergySource to satisfy
+            an EnergyDemand. The result of exploitation. Domain-specific consumption
+            types are defined as subclasses in extension files:
+            - water:WaterEnergyConsumption  (water_energy.ttl)
+            - solar:SolarEnergyConsumption  (solar_energy.ttl)
+        """ .
+
+        
+
+    # -------------------------------------------------------------------------
+    # SMART SUBCLASSES — equivalentClass axioms enable automatic classification
+    # -------------------------------------------------------------------------
+    energy:ElectricalEnergyConsumption a owl:Class ;
+        rdfs:subClassOf energy:EnergyConsumption ;
+        owl:equivalentClass [
+            rdf:type owl:Class ;
+            owl:intersectionOf (
+                energy:EnergyConsumption
+                [ a owl:Restriction ;
+                  owl:onProperty energy:hasEnergyCarrierType ;
+                  owl:hasValue energy:Electrical ]
+            )
+        ] ;
+        rdfs:label "Electrical Energy Consumption" ;
+        rdfs:comment "Consumption in the form of electricity. Unit: kWh. Automatically classified by a reasoner for any EnergyConsumption individual whose hasEnergyCarrierType is energy:Electrical." .
+
+    energy:ThermalEnergyConsumption a owl:Class ;
+        rdfs:subClassOf energy:EnergyConsumption ;
+        owl:equivalentClass [
+            rdf:type owl:Class ;
+            owl:intersectionOf (
+                energy:EnergyConsumption
+                [ a owl:Restriction ;
+                  owl:onProperty energy:hasEnergyCarrierType ;
+                  owl:hasValue energy:Thermal ]
+            )
+        ] ;
+        rdfs:label "Thermal Energy Consumption" ;
+        rdfs:comment "Consumption in the form of heat. Unit: kWh thermal or MJ. Automatically classified by a reasoner for any EnergyConsumption individual whose hasEnergyCarrierType is energy:Thermal." .
+
+    # --- Properties on EnergyConsumption ---
+
+    energy:hasConsumptionValue a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range qudt:QuantityValue ;
+        rdfs:label "has consumption value" ;
+        rdfs:comment "The total energy consumed over a period (kWh or MJ)." .
+
+    energy:hasConsumptionRate a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range qudt:QuantityValue ;
+        rdfs:label "has consumption rate" ;
+        rdfs:comment "Energy consumed per unit of output (kWh/m³ for water processes, kW instantaneous for power readings)." .
+
+    # hasEnergyCarrierType is the consumption-side mirror of energy:hasEnergyCarrier
+    # on EnergySource. Declared as an ObjectProperty (range: energy:EnergyCarrier)
+    # so that owl:equivalentClass restrictions on the subclasses below can reference
+    # the same named individuals (energy:Electrical, energy:Thermal, etc.) and
+    # a reasoner can perform type inference automatically.
+    energy:hasEnergyCarrierType a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergyCarrier ;
+        rdfs:label "has energy carrier type" ;
+        rdfs:comment "The carrier form of the consumed energy (same vocabulary as energy:hasEnergyCarrier). Electrical, Thermal, or Chemical." .
+
+    energy:causedByDemand a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergyDemand ;
+        rdfs:label "caused by demand" ;
+        rdfs:comment "Inverse of energy:resultsIn. Links consumption back to the demand that caused it." .
+
+    energy:drawnFromSource a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergySource ;
+        rdfs:label "drawn from source" ;
+        rdfs:comment "Links a consumption event to the EnergySource it drew from." .
+
+# --- Reading link (for hourly/timestamped instance data) ---
+
+energy:isReadingOf a owl:ObjectProperty ;
+    rdfs:label "is reading of" ;
+    rdfs:comment """
+        Links a qudt:QuantityValue (a timestamped reading individual) back to the
+        EnergySource or EnergyConsumption domain individual it measures.
+        Used by instance data files (e.g. household_energy_timeseries.ttl) to
+        attach sosa:Observation values to the correct ontology individual.
+    """ .
+
+# --- Measurement type (measured directly vs derived from inputs) ---
+energy:MeasurementType a owl:Class ;
+    rdfs:label "Measurement Type" ;
+    rdfs:comment """
+        Distinguishes how a reading value was obtained:
+          'Measured'  — directly observed by a sensor (e.g. Solar_PowerMeter, MBR_PowerMeter)
+          'Derived'   — computed from other measured inputs
+                        (e.g. Grid power = MBR power + RO power - Solar power;
+                              MBR power  = ratedPower x BlowerLoad fraction;
+                              RO power   = specificEnergy x FeedFlow)
+        SPARQL queries use this flag to decide whether to read a value directly
+        or compute it from its inputs.
+    """ .
+    energy:Measured a owl:MeasurementType ;
+    rdfs:label "Measured" ;
+    rdfs:comment "A measurement that was directly observed by a sensor." .
+    energy:Derived a owl:MeasurementType ;
+    rdfs:label "Derived" ;
+    rdfs:comment "A measurement that was computed from other measured inputs." .
+
+energy:isMeasurementType a owl:ObjectProperty ;
+    rdfs:domain qudt:QuantityValue ;
+    rdfs:range energy:MeasurementType ;
+    rdfs:label "is measurement type" ;
+    rdfs:comment "Indicates whether a reading value was directly measured or derived from other inputs." .
+
+# =============================================================================
+# OBSERVABLE PROPERTIES (general — extended by domain files)
+# =============================================================================
+# Named individuals for sosa:observedProperty links in instance data.
+# Domain extension files add further observable property individuals.
+
+energy:ObservableProperty a owl:Class ;
+    rdfs:label "Observable Property" ;
+    rdfs:comment "A measurable physical quantity observed by a sensor. Open class — domain extension files add further individuals." .
+
+energy:ElectricalPower a owl:NamedIndividual, energy:ObservableProperty ;
+    rdfs:label "Electrical Power" ;
+    rdfs:comment "Observable property: instantaneous electrical power (kW). Used by PowerMeter sensors." .
+
+energy:LoadFraction a owl:NamedIndividual, energy:ObservableProperty ;
+    rdfs:label "Load Fraction" ;
+    rdfs:comment "Observable property: dimensionless operating load fraction (0–1). Used by LoadSensor sensors." .

@@ -46,10 +46,10 @@
 
         DERIVATION PATTERNS supported by this ontology:
           Pattern 1 — MBR power from blower load:
-            MBR_power (kW) = solar:ratedPower × solar:LoadFraction observation value
+            MBR_power (kW) = solar:ratedPower x solar:LoadFraction observation value
 
           Pattern 2 — RO power from feed flow:
-            RO_power (kW)  = solar:specificEnergy × solar:FlowRate observation value
+            RO_power (kW)  = solar:specificEnergy x solar:FlowRate observation value
 
           Pattern 3 — Grid power as balance:
             Grid_power (kW) = MAX(0, MBR_power + RO_power − Solar_power)
@@ -213,7 +213,7 @@ solar:FlowSensor a owl:Class ;
         Observable property: solar:FlowRate.
         Instance: RO_FeedFlow sensor monitoring the RO inlet port.
         Measurement type: Measured. Used as input to Pattern 2 derivation.
-        Note: flow (m³/h) × specificEnergy (kWh/m³) = power (kW).
+        Note: flow (m³/h) x specificEnergy (kWh/m³) = power (kW).
     """ .
 
 
@@ -240,13 +240,13 @@ solar:Pattern_MBR_Power a owl:NamedIndividual ;
     rdfs:label "MBR Power Derivation Pattern" ;
     rdfs:comment """
         Pattern 1: MBR instantaneous power (kW)
-        Formula : MBR_power = ratedPower × BlowerLoad_fraction
+        Formula : MBR_power = ratedPower x BlowerLoad_fraction
         Inputs  : solar:ratedPower on MBR_AerationBlower individual (qudt:QuantityValue, kW)
                   sosa:Observation of energy:LoadFraction by MBR_BlowerLoad sensor
         Output  : sosa:Observation of energy:ElectricalPower by MBR_PowerMeter
                   energy:isMeasurementType = 'Derived' on computed observations,
                   'Measured' on ground-truth MBR_PowerMeter observations
-        Verification: load_fraction × 1.6 kW = MBR_PowerMeter reading
+        Verification: load_fraction x 1.6 kW = MBR_PowerMeter reading
     """ .
 
 solar:Pattern_RO_Power a owl:NamedIndividual ;

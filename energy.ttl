@@ -7,55 +7,126 @@
 @prefix unit:    <http://qudt.org/vocab/unit/> .
 @prefix sosa:    <http://www.w3.org/ns/sosa/> .
 
+# JD: That' a deprecated the old file right?
+# --------------SuperClass -----------------------------------------
+energysource:EnergySourceProcess a owl:Class ;
+rdfs:label "Energy Source Process " .
+#----------------Classes --------------------------------
+energysource:WaterConveyance a owl:Class;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label "Water Conveyance".
 
-# =============================================================================
-# ONTOLOGY DECLARATION
-# =============================================================================
+energysource:WaterTreatment a owl:Class;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label "Water Treatment".
 
-<https://ugentbiomath.github.io/ontology/energy.ttl>
-    a owl:Ontology ;
-    rdfs:label "Energy Framework Ontology" ;
-    rdfs:comment """
-        General foundational framework for modelling energy sources, energy demand,
-        and energy consumption. This file is domain-agnostic — it defines the core
-        concepts and relationships that any domain-specific extension must build upon.
+energysource:WaterDistribution a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Water Distribution".
 
-        DESIGN PRINCIPLE:
-        The use of an EnergySource creates an EnergyDemand. Satisfying that demand
-        results in EnergyConsumption as a measurable by-product. This causal chain
-        is the backbone of the framework:
+energysource:WasteWaterCollection a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Waste Water Collection".
 
-            EnergySource → exploited to meet → EnergyDemand
-                                                    └── results in → EnergyConsumption
+energysource:WasteWaterTreatment a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Waste Water Treatment".
 
-        DOMAIN EXTENSIONS (import this file and subclass EnergyConsumption):
-          - water_energy.ttl : water and wastewater treatment processes
-                               <https://ugentbiomath.github.io/ontology/water_energy.ttl>
-          - solar_energy.ttl : solar PV systems and household energy components
-                               <https://ugentbiomath.github.io/ontology/solar_energy.ttl>
+energysource:WasteWaterDischarge a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label " Waste Water Discharge".
 
-        INSTANCE DATA:
-          Domain-specific instance files import the relevant extension ontology and
-          use sosa:Observation to record timestamped energy readings. The framework
-          supports both directly measured and derived values via energy:isMeasurementType.
+energysource:RecycledWasteWaterTreatment a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label "Recycled Waste Water Treatment" .
 
-        OUT OF SCOPE FOR THIS FILE:
-          - Emission intensity and carbon accounting
-          - Energy efficiency and conversion losses
-          - Domain-specific process classes (defined in extension files)
-    """ ;
-    rdfs:seeAlso
-        <https://ugentbiomath.github.io/ontology/water_energy.ttl> ,
-        <https://ugentbiomath.github.io/ontology/solar_energy.ttl> .
+energysource:RecycledWaterDistribution a owl:Class ;
+rdfs:subClassOf energysource:EnergySourceProcess;
+rdfs:label "Recycled Water Distribution" .
 
+energysource:GroundWaterPumping a owl:Class ;
+rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:label "Ground Water Pumping (Water Conveyance)" .
 
-# =============================================================================
-# TIER 1 — ENERGY SOURCE
-# =============================================================================
-# An EnergySource is any entity that supplies energy.
-# It is the superior class. Everything downstream is a consequence of
-# exploiting it. The USE of an EnergySource creates an EnergyDemand,
-# which in turn results in EnergyConsumption.
+energysource:SurfaceWaterPumping a owl:Class ;
+rdfs:subClassOf energysource:WaterConveyance ;
+rdfs:label "Surface Water Pumping (Water Conveyance)" .
+
+energysource:SurfaceWaterPumping_Normal a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Normal Surface Water Pumping (Water Conveyance)" .
+
+energysource:SurfaceWaterPumping_Gravity a owl:Class;
+rdfs:subClassOf energysource:SurfaceWaterPumping ;
+rdfs:label "Gravity driven Surface Water Pumping (Water Conveyance)" .
+
+energysource:Chlorination a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Chlorination" .
+
+energysource:CoagulantFeeding a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Coagulant Feeding" .
+
+energysource:RapidMixing a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Rapid Mixing" .
+
+energysource:Flocculation a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Flocculation" .
+
+energysource:Sedimentation a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Sedimentation" .
+
+energysource:GravityFiltration a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Gravity Filtration" .
+
+energysource:HydraulicSurfaceWashing a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Hydraulic Surface Washing" .
+
+energysource:ReverseOsmosis a owl:Class;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label " Reverse Osmosis" .
+
+energysource:SeaWaterReverseOsmosis a owl:Class;
+rdfs:subClassOf energysource:ReverseOsmosis ;
+rdfs:label " Sea Water Reverse Osmosis".
+
+energysource:BrackishWaterReverseOsmosis a owl:Class;
+rdfs:subClassOf energysource:ReverseOsmosis ;
+rdfs:label "Brackish Water Reverse Osomosis".
+
+energysource:MSF a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label " MSF Desalination (Water Treatment)" .
+
+energysource:MED a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label " MED Desalination (Water Treatment)" .
+
+energysource:MVC a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label " MVC Desalination (Water Treatment)" .
+
+energysource:BackWashPumping a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Back Wash Pumping" .
+
+energysource:InPlantPumping a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "In-Plant Pumping" .
+
+energysource:ChlorineFeeding a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "Chlorine Feeding" .
+
+energysource:HighServicePumping a owl:Class ;
+rdfs:subClassOf energysource:WaterTreatment ;
+rdfs:label "High Service Pumping" .
 
 energy:EnergySource a owl:Class ;
     rdfs:label "Energy Source" ;

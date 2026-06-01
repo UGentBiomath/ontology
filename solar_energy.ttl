@@ -99,6 +99,9 @@ solar:EnergySystemComponent a owl:Class ;
     rdfs:label "Energy System Component" ;
     rdfs:comment "A physical node in the energy flow network of an installation. Sensors are attached to components; observations have components as their feature of interest." .
 
+# JD: careful -- here, you are subclassing both EnergySystemComponent and SolarEnergy at the same time. That has implications you might not mean.
+# For instance, it means that a SolarEnergy object and a EnergySystemComponent are the same, since one object (SolarPVSystem) can be both.
+# What you might have meant is that SolarPVSystem is a subclass of EnergySystemComponent that has a property restriction on the hasEnergyCarrierType property where the carrier can only be SolarEnergy (I'm not sure I used the right property, but you see what I mean )
 solar:SolarPVSystem a owl:Class ;
     rdfs:subClassOf solar:EnergySystemComponent ;
     rdfs:subClassOf energy:SolarEnergy ;
@@ -111,6 +114,7 @@ solar:SolarPVSystem a owl:Class ;
         Carrier: Electrical. Origin: Primary. Availability: Intermittent.
     """ .
 
+# JD: same as above
 solar:GridConnection a owl:Class ;
     rdfs:subClassOf solar:EnergySystemComponent ;
     rdfs:subClassOf energy:ElectricityGrid ;
@@ -224,6 +228,7 @@ solar:FlowSensor a owl:Class ;
 # energy:ElectricalPower and energy:LoadFraction are defined in energy.ttl
 # and reused here. FlowRate is solar-domain specific.
 
+# JD: maybe this needs to be grouped with water, not solar?
 solar:FlowRate a owl:NamedIndividual ;
     rdfs:label "Flow Rate" ;
     rdfs:comment "Observable property: volumetric flow rate (m³/h). Observed by FlowSensor instances on feed water inlet ports." .
@@ -253,7 +258,7 @@ solar:Pattern_RO_Power a owl:NamedIndividual ;
     rdfs:label "RO Power Derivation Pattern" ;
     rdfs:comment """
         Pattern 2: RO instantaneous power (kW)
-        Formula : RO_power = specificEnergy × FeedFlow
+        Formula : RO_power = specificEnergy × FeedFlow # JD: weird x again
         Inputs  : solar:specificEnergy on RO_HighPressurePump individual (qudt:QuantityValue, kWh/m³)
                   sosa:Observation of solar:FlowRate by RO_FeedFlow sensor (m³/h)
         Output  : sosa:Observation of energy:ElectricalPower by RO_PowerMeter

@@ -258,13 +258,13 @@ solar:Pattern_RO_Power a owl:NamedIndividual ;
     rdfs:label "RO Power Derivation Pattern" ;
     rdfs:comment """
         Pattern 2: RO instantaneous power (kW)
-        Formula : RO_power = specificEnergy × FeedFlow # JD: weird x again
+        Formula : RO_power = specificEnergy x FeedFlow # JD: weird x again
         Inputs  : solar:specificEnergy on RO_HighPressurePump individual (qudt:QuantityValue, kWh/m³)
                   sosa:Observation of solar:FlowRate by RO_FeedFlow sensor (m³/h)
         Output  : sosa:Observation of energy:ElectricalPower by RO_PowerMeter
                   energy:isMeasurementType = 'Derived' on computed observations,
                   'Measured' on ground-truth RO_PowerMeter observations
-        Verification: flow_rate × 3.0 kWh/m³ = RO_PowerMeter reading
+        Verification: flow_rate x 3.0 kWh/m³ = RO_PowerMeter reading
     """ .
 
 solar:Pattern_Grid_Power a owl:NamedIndividual ;

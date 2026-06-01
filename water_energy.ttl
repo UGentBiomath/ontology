@@ -59,7 +59,7 @@
 
 
 # =============================================================================
-# TIER 1 — WATER ENERGY CONSUMPTION
+# WATER ENERGY CONSUMPTION
 # =============================================================================
 # Subclass of energy:EnergyConsumption. The water sector domain node.
 # All water process consumption traces up through this class to
@@ -78,7 +78,7 @@ water:WaterEnergyConsumption a owl:Class ;
 
 
 # =============================================================================
-# TIER 2 — WATER PROCESS
+# TIER 1 — WATER PROCESS
 # =============================================================================
 # A WaterProcess is the activity that creates the EnergyDemand within
 # the water sector. It is the unit of consumption measurement.
@@ -118,6 +118,10 @@ water:hasVariable a owl:ObjectProperty ;
     rdfs:range qudt:QuantityValue ;
     rdfs:label "has variable" ;
     rdfs:comment "Links a WaterProcess to one of its input variables used in energy calculation." .
+
+# =============================================================================
+# PROPERTIES — Energy consumption of GroundWater and SurfaceWater Pumping as input variables
+# =============================================================================
 
 water:hasLiftDistance a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
@@ -185,7 +189,7 @@ water:hasPrecipitationRate a owl:ObjectProperty ;
 
 
 # =============================================================================
-# TIER 3 — WATER CYCLE PROCESS CATEGORIES
+# TIER 2 — WATER CYCLE PROCESS
 # =============================================================================
 
 water:WaterConveyance a owl:Class ;
@@ -226,7 +230,7 @@ water:RecycledWaterDistribution a owl:Class ;
 
 
 # =============================================================================
-# TIER 4 — WATER CONVEYANCE SUB-PROCESSES
+# TIER 3 — WATER CONVEYANCE SUB-PROCESSES
 # =============================================================================
 
 water:GroundWaterPumping a owl:Class ;
@@ -405,7 +409,7 @@ water:DistributionPumping a owl:Class ;
 
 
 # =============================================================================
-# TIER 4 — WASTEWATER TREATMENT SUB-GROUPS (grouped by treatment train stage)
+# TIER 5 — WASTEWATER TREATMENT SUB-GROUPS (grouped by treatment train stage)
 # =============================================================================
 
 water:PrimaryTreatment a owl:Class ;

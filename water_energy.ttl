@@ -139,6 +139,17 @@ water:hasTime a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has time" .
 
+    water:GroundWaterPumping
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLiftDistance ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFlowVolume ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPressureRequirement ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasTime ;
+        owl:someValuesFrom qudt:QuantityValue ] .
+
+
 water:hasLengthOfPipeline a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has length of pipeline" .
@@ -159,6 +170,17 @@ water:hasAge a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has age" .
 
+water:SurfaceWaterPumping_Normal
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLengthOfPipeline ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasCrossSectionArea ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasHazenWilliamsCoefficient ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSlope ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasAge ;
+        owl:someValuesFrom qudt:QuantityValue ] .
 water:hasChannelLength a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has channel length" .
@@ -186,6 +208,23 @@ water:hasEvapotranspirationRate a owl:ObjectProperty ;
 water:hasPrecipitationRate a owl:ObjectProperty ;
     rdfs:subPropertyOf water:hasVariable ;
     rdfs:label "has precipitation rate" .
+
+    water:SurfaceWaterPumping_Gravity
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasChannelLength ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasConstantSpecificToMaterial ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSoilPermeability ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasBedSlope ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFrictionalandVegetativeResistance ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasEvapotranspirationRate ;
+        owl:someValuesFrom qudt:QuantityValue ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPrecipitationRate ;
+        owl:someValuesFrom qudt:QuantityValue ] .
+
 
 
 # =============================================================================
@@ -511,412 +550,366 @@ water:WasteWaterPumping a owl:Class ;
 
 
 # =============================================================================
-# STANDARD READING INDIVIDUALS (benchmark kWh/m³ values per process)
+# STANDARD READING INDIVIDUALS along with OWL restrictions (benchmark kWh/m³ values per process)
 # =============================================================================
 # These are schema-level anchor individuals. Instance data files attach
 # hourly sosa:Observation values to process individuals referencing these
 # as their type template via energy:isReadingOf.
-
-water:Reading_BoosterPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Booster Pumping Reading" .
-
-water:Reading_WellPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Well Pumping Reading" .
-
-water:Reading_DistributionPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Distribution Pumping Reading" .
-
-water:Reading_Coagulant_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Coagulant Feeding Reading" .
-
-water:Reading_ChlorineFeeding_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Chlorine Feeding Reading" .
-
-water:Reading_ChemicalAddition_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Chemical Addition Reading" .
-
-water:Reading_Chlorination_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Chlorination Reading" .
-
-water:Reading_SurfaceWaterChlorandDechlor_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Surface Water Chlorination and Dechlorination Reading" .
-
-water:Reading_GroundWaterChlorandDechlor_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Ground Water Chlorination and Dechlorination Reading" .
-
-water:Reading_UVIrradiation_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard UV Irradiation Reading" .
-
-water:Reading_Ozone_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Ozone Reading" .
-
-water:Reading_RapidMixing_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Rapid Mixing Reading" .
-
-water:Reading_Flocculation_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Flocculation Reading" .
-
-water:Reading_Sedimentation_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Sedimentation Reading" .
-
-water:Reading_GravityFiltration_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Gravity Filtration Reading" .
-
-water:Reading_HydraulicSurfaceWash_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Hydraulic Surface Wash Reading" .
-
-water:Reading_BackWash_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Back Wash Pumping Reading" .
-
-water:Reading_MicroFiltration_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Microfiltration Reading" .
-
-water:Reading_HydraCAP60_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard HydraCAP 60 Reading" .
-
-water:Reading_ReverseOsmosis_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Reverse Osmosis Reading" .
-
-water:Reading_SeaWater_ReverseOsmosis_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Sea Water Reverse Osmosis Reading" .
-
-water:Reading_Brackish_ReverseOsmosis_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Brackish Water Reverse Osmosis Reading" .
-
-water:Reading_MSF_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard MSF Reading" .
-
-water:Reading_MED_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard MED Reading" .
-
-water:Reading_MVC_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard MVC Reading" .
-
-water:Reading_InPlant_Pumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard In-Plant Pumping Reading" .
-
-water:Reading_HighServicePumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard High Service Pumping Reading" .
-
-water:Reading_AeratedGrit_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Aerated Grit Removal Reading" .
-
-water:Reading_PrimaryClarifiers_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Primary Clarifiers Reading" .
-
-water:Reading_ActivatedSludge_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Activated Sludge Reading" .
-
-water:Reading_OxidationDitch_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Oxidation Ditch Reading" .
-
-water:Reading_Trickling_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Trickling Reading" .
-
-water:Reading_MembraneBioReac_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Membrane Bio Reactor Reading" .
-
-water:Reading_Lagoons_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Lagoons Reading" .
-
-water:Reading_Aeration_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Aeration Reading" .
-
-water:Reading_ReturnSludgePump_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Return Sludge Pumping Reading" .
-
-water:Reading_SecondaryClarifiers_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Secondary Clarifiers Reading" .
-
-water:Reading_BiologicalNitrification_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Biological Nitrification Reading" .
-
-water:Reading_AdvancedWaterTreatment_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Advanced Water Treatment Reading" .
-
-water:Reading_Filtration_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Filtration Reading" .
-
-water:Reading_FilterFeedPump_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Filter Feed Pumping Reading" .
-
-water:Reading_Digestion_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Digestion Reading" .
-
-water:Reading_Dewatering_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Dewatering Reading" .
-
-water:Reading_WasteWaterPumping_Std a qudt:QuantityValue ;
-    qudt:unit unit:KiloWattHourPerCubicMeter ;
-    rdfs:label "Standard Waste Water Pumping Reading" .
-
-
-# =============================================================================
-# OWL RESTRICTIONS — binding standard readings to leaf process classes
-# =============================================================================
 # These restrictions declare that every instance of a leaf process class
 # has a specific benchmark energy consumption value. SPARQL queries against
 # this ontology will return the standard reading for any process instance
 # without needing the value to be asserted on the individual directly.
 
-water:BoosterPumping rdfs:subClassOf [
+water:Reading_BoosterPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Booster Pumping Reading" .
+
+    water:BoosterPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_BoosterPumping_Std ] .
 
-water:WellPumping rdfs:subClassOf [
+water:Reading_WellPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Well Pumping Reading" .
+
+    water:WellPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_WellPumping_Std ] .
 
-water:DistributionPumping rdfs:subClassOf [
+water:Reading_DistributionPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Distribution Pumping Reading" .
+
+    water:DistributionPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_DistributionPumping_Std ] .
 
-water:CoagulantFeeding rdfs:subClassOf [
+
+water:Reading_Coagulant_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Coagulant Feeding Reading" .
+
+    water:CoagulantFeeding rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Coagulant_Std ] .
 
-water:ChlorineFeeding rdfs:subClassOf [
+water:Reading_ChlorineFeeding_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chlorine Feeding Reading" .
+
+    water:ChlorineFeeding rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_ChlorineFeeding_Std ] .
 
-water:ChemicalAddition rdfs:subClassOf [
+water:Reading_ChemicalAddition_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chemical Addition Reading" .
+
+    water:ChemicalAddition rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_ChemicalAddition_Std ] .
 
+water:Reading_Chlorination_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Chlorination Reading" .
 water:Chlorination rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Chlorination_Std ] .
 
-water:SurfaceWaterChlorinationandDechlorination rdfs:subClassOf [
+water:Reading_SurfaceWaterChlorandDechlor_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Surface Water Chlorination and Dechlorination Reading" .
+
+    water:SurfaceWaterChlorinationandDechlorination rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_SurfaceWaterChlorandDechlor_Std ] .
 
-water:GroundWaterChlorinationandDechlorination rdfs:subClassOf [
+water:Reading_GroundWaterChlorandDechlor_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Ground Water Chlorination and Dechlorination Reading" .
+
+    water:GroundWaterChlorinationandDechlorination rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_GroundWaterChlorandDechlor_Std ] .
+
+water:Reading_UVIrradiation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard UV Irradiation Reading" .
 
 water:UVIrradiation rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_UVIrradiation_Std ] .
 
-water:Ozone rdfs:subClassOf [
+water:Reading_Ozone_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Ozone Reading" .
+
+    water:Ozone rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Ozone_Std ] .
+
+water:Reading_RapidMixing_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Rapid Mixing Reading" .
 
 water:RapidMixing rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_RapidMixing_Std ] .
 
+water:Reading_Flocculation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Flocculation Reading" .
+
 water:Flocculation rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Flocculation_Std ] .
+
+water:Reading_Sedimentation_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Sedimentation Reading" .
 
 water:Sedimentation rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Sedimentation_Std ] .
 
-water:GravityFiltration rdfs:subClassOf [
+water:Reading_GravityFiltration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Gravity Filtration Reading" .
+
+    water:GravityFiltration rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_GravityFiltration_Std ] .
+
+water:Reading_HydraulicSurfaceWash_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Hydraulic Surface Wash Reading" .
 
 water:HydraulicSurfaceWashing rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_HydraulicSurfaceWash_Std ] .
 
+water:Reading_BackWash_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Back Wash Pumping Reading" .
+
 water:BackWashPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_BackWash_Std ] .
+
+water:Reading_MicroFiltration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Microfiltration Reading" .
 
 water:MicroFiltration rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_MicroFiltration_Std ] .
 
+water:Reading_HydraCAP60_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard HydraCAP 60 Reading" .
+
 water:HydraCAP60 rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_HydraCAP60_Std ] .
 
-water:ReverseOsmosis rdfs:subClassOf [
+water:Reading_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Reverse Osmosis Reading" .
+
+    water:ReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_ReverseOsmosis_Std ] .
 
-water:SeaWaterReverseOsmosis rdfs:subClassOf [
+water:Reading_SeaWater_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Sea Water Reverse Osmosis Reading" .
+
+    water:SeaWaterReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_SeaWater_ReverseOsmosis_Std ] .
 
-water:BrackishWaterReverseOsmosis rdfs:subClassOf [
+
+
+water:Reading_Brackish_ReverseOsmosis_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Brackish Water Reverse Osmosis Reading" .
+
+    water:BrackishWaterReverseOsmosis rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Brackish_ReverseOsmosis_Std ] .
+
+
+water:Reading_MSF_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MSF Reading" .
 
 water:MSF rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
     owl:hasValue water:Reading_MSF_Std ] .
 
+water:Reading_MED_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MED Reading" .
+
 water:MED rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
     owl:hasValue water:Reading_MED_Std ] .
 
-water:MVC rdfs:subClassOf [
+water:Reading_MVC_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard MVC Reading" .
+
+    water:MVC rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasThermalEnergyConsumption ;
     owl:hasValue water:Reading_MVC_Std ] .
 
-water:InPlantPumping rdfs:subClassOf [
+water:Reading_InPlant_Pumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard In-Plant Pumping Reading" .
+
+    water:InPlantPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_InPlant_Pumping_Std ] .
 
-water:HighServicePumping rdfs:subClassOf [
+water:Reading_HighServicePumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard High Service Pumping Reading" .
+
+    water:HighServicePumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_HighServicePumping_Std ] .
 
-water:AeratedGritRemoval rdfs:subClassOf [
+water:Reading_AeratedGrit_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Aerated Grit Removal Reading" .
+
+    water:AeratedGritRemoval rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_AeratedGrit_Std ] .
+
+water:Reading_PrimaryClarifiers_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Primary Clarifiers Reading" .
 
 water:PrimaryClarifiers rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_PrimaryClarifiers_Std ] .
+water:Reading_ActivatedSludge_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Activated Sludge Reading" .
 
-water:ActivatedSludge rdfs:subClassOf [
+    water:ActivatedSludge rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_ActivatedSludge_Std ] .
+
+water:Reading_OxidationDitch_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Oxidation Ditch Reading" .
 
 water:OxidationDitch rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_OxidationDitch_Std ] .
 
+water:Reading_Trickling_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Trickling Reading" .
+
 water:Trickling rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Trickling_Std ] .
 
-water:MembraneBio_Reactors rdfs:subClassOf [
+water:Reading_MembraneBioReac_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Membrane Bio Reactor Reading" .
+
+water:MembraneBioReactor rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
-    owl:hasValue water:Reading_MembraneBioReac_Std ] .
+    owl:hasValue water:Reading_MembraneBioReac_Std ] .    
+
+water:Reading_Lagoons_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Lagoons Reading" .
 
 water:Lagoons rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Lagoons_Std ] .
 
+water:Reading_Aeration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Aeration Reading" .
+
 water:Aeration rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Aeration_Std ] .
+
+water:Reading_ReturnSludgePump_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Return Sludge Pumping Reading" .
 
 water:ReturnSludgePumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_ReturnSludgePump_Std ] .
 
+water:Reading_SecondaryClarifiers_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Secondary Clarifiers Reading" .
+
 water:SecondaryClarifiers rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_SecondaryClarifiers_Std ] .
+
+water:Reading_BiologicalNitrification_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Biological Nitrification Reading" .
 
 water:BiologicalNitrification rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_BiologicalNitrification_Std ] .
 
+water:Reading_AdvancedWaterTreatment_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Advanced Water Treatment Reading" .
+
 water:AdvancedWaterTreatment rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_AdvancedWaterTreatment_Std ] .
 
-water:Filtration rdfs:subClassOf [
+water:Reading_Filtration_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Filtration Reading" .
+
+    water:Filtration rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Filtration_Std ] .
 
-water:FilterFeedPumping rdfs:subClassOf [
+water:Reading_FilterFeedPump_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Filter Feed Pumping Reading" .
+
+    water:FilterFeedPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_FilterFeedPump_Std ] .
+
+water:Reading_Digestion_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Digestion Reading" .
 
 water:Digestion rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Digestion_Std ] .
 
+water:Reading_Dewatering_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Dewatering Reading" .
+
 water:Dewatering rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_Dewatering_Std ] .
 
+water:Reading_WasteWaterPumping_Std a qudt:QuantityValue ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "Standard Waste Water Pumping Reading" .
+
 water:WasteWaterPumping rdfs:subClassOf [
     a owl:Restriction ; owl:onProperty water:hasEnergyConsumption ;
     owl:hasValue water:Reading_WasteWaterPumping_Std ] .
-
-
-# =============================================================================
-# OWL RESTRICTIONS — input variables required per WaterProcess subclass
-# =============================================================================
-
-water:GroundWaterPumping
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLiftDistance ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFlowVolume ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPressureRequirement ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasTime ;
-        owl:someValuesFrom qudt:QuantityValue ] .
-
-water:SurfaceWaterPumping_Normal
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasLengthOfPipeline ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasCrossSectionArea ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasHazenWilliamsCoefficient ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSlope ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasAge ;
-        owl:someValuesFrom qudt:QuantityValue ] .
-
-water:SurfaceWaterPumping_Gravity
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasChannelLength ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasConstantSpecificToMaterial ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasSoilPermeability ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasBedSlope ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasFrictionalandVegetativeResistance ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasEvapotranspirationRate ;
-        owl:someValuesFrom qudt:QuantityValue ] ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty water:hasPrecipitationRate ;
-        owl:someValuesFrom qudt:QuantityValue ] .

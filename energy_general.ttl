@@ -69,9 +69,24 @@ energy:EnergySource a owl:Class ;
 
 # --- Carrier type (what form the energy takes) ---
 
-energy:hasEnergyCarrier a owl:DatatypeProperty ;
+# 1. Define the class for energy carriers
+
+energy:EnergyCarrier a owl:Class ;
+    rdfs:label "Energy Carrier" ;
+    rdfs:comment "The physical form in which energy is stored or delivered." .
+
+# 2. Define the individuals (instances) of that class.
+
+energy:Electrical a energy:EnergyCarrier ; rdfs:label "Electrical" .
+energy:Thermal    a energy:EnergyCarrier ; rdfs:label "Thermal" .
+energy:Chemical   a energy:EnergyCarrier ; rdfs:label "Chemical" .
+energy:Mechanical a energy:EnergyCarrier ; rdfs:label "Mechanical" .
+
+
+# 3. Define the Object Property pointing to the class
+energy:hasEnergyCarrier a owl:ObjectProperty ;
     rdfs:domain energy:EnergySource ;
-    rdfs:range xsd:string ;
+    rdfs:range energy:EnergyCarrier ;
     rdfs:label "has energy carrier" ;
     rdfs:comment "The physical form in which the source delivers energy: Electrical, Thermal, Chemical, or Mechanical." .
 
@@ -209,9 +224,20 @@ energy:EnergyDemand a owl:Class ;
           - Grid balancing (derived: grid draws what solar does not cover)
     """ .
 
-energy:hasDemandType a owl:DatatypeProperty ;
+# 2. Define the individuals (instances) of that class belonging to the Standard Demand Types
+energy:Mechanical     a energy:DemandType ; rdfs:label "Mechanical" .
+energy:Chemical       a energy:DemandType ; rdfs:label "Chemical" .
+energy:Thermal        a energy:DemandType ; rdfs:label "Thermal" .
+energy:Electrochemical a energy:DemandType ; rdfs:label "Electrochemical" .
+energy:GridBalancing  a energy:DemandType ; rdfs:label "Grid Balancing" .
+
+# 3. Define the individuals (instances) of that class belonging to the Standard Demand Frequencies
+energy:Continuous a energy:DemandFrequency ; rdfs:label "Continuous" .
+energy:Batch      a energy:DemandFrequency ; rdfs:label "Batch" .
+energy:Peak       a energy:DemandFrequency ; rdfs:label "Peak" .
+energy:hasDemandType a owl:ObjectProperty ;
     rdfs:domain energy:EnergyDemand ;
-    rdfs:range xsd:string ;
+    rdfs:range energy:DemandType ;
     rdfs:label "has demand type" ;
     rdfs:comment "Type of work the demand represents: Mechanical, Chemical, Thermal, or Electrochemical." .
 
@@ -220,10 +246,9 @@ energy:hasDemandMagnitude a owl:ObjectProperty ;
     rdfs:range qudt:QuantityValue ;
     rdfs:label "has demand magnitude" ;
     rdfs:comment "The quantity of energy required to satisfy the demand (kWh or kW)." .
-
-energy:hasDemandFrequency a owl:DatatypeProperty ;
+energy:hasDemandFrequency a owl:ObjectProperty ;
     rdfs:domain energy:EnergyDemand ;
-    rdfs:range xsd:string ;
+    rdfs:range energy:DemandFrequency ;
     rdfs:label "has demand frequency" ;
     rdfs:comment "Whether the demand is Continuous, Batch, or Peak." .
 
@@ -233,80 +258,101 @@ energy:isMetBy a owl:ObjectProperty ;
     rdfs:label "is met by" ;
     rdfs:comment "Links an EnergyDemand to the EnergySource that supplies it." .
 
-energy:resultsIn a owl:ObjectProperty ;
-    rdfs:domain energy:EnergyDemand ;
-    rdfs:range energy:EnergyConsumption ;
-    rdfs:label "results in" ;
-    rdfs:comment "Links an EnergyDemand to the EnergyConsumption it produces when satisfied." .
+    # =============================================================================
+    # TIER 3 — ENERGY CONSUMPTION
+    # =============================================================================
+    # EnergyConsumption is the measurable by-product of satisfying an EnergyDemand
+    # by drawing from an EnergySource. It is not an independent phenomenon —
+    # it is caused by demand and traceable back to a source.
+    #
+    # DOMAIN EXTENSION PATTERN:
+    #   To add a new consumption domain, create a new file that:
+    #     (1) imports this file via owl:imports
+    #     (2) declares a subclass of energy:EnergyConsumption
+    #     (3) defines domain-specific process classes and reading individuals
+    #
+    #   Example:
+    #     my_domain:MyEnergyConsumption rdfs:subClassOf energy:EnergyConsumption .
 
+    energy:EnergyConsumption a owl:Class ;
+        rdfs:label "Energy Consumption" ;
+        rdfs:comment """
+            The measurable quantity of energy drawn from an EnergySource to satisfy
+            an EnergyDemand. The result of exploitation. Domain-specific consumption
+            types are defined as subclasses in extension files:
+            - water:WaterEnergyConsumption  (water_energy.ttl)
+            - solar:SolarEnergyConsumption  (solar_energy.ttl)
+        """ .
 
-# =============================================================================
-# TIER 3 — ENERGY CONSUMPTION
-# =============================================================================
-# EnergyConsumption is the measurable by-product of satisfying an EnergyDemand
-# by drawing from an EnergySource. It is not an independent phenomenon —
-# it is caused by demand and traceable back to a source.
-#
-# DOMAIN EXTENSION PATTERN:
-#   To add a new consumption domain, create a new file that:
-#     (1) imports this file via owl:imports
-#     (2) declares a subclass of energy:EnergyConsumption
-#     (3) defines domain-specific process classes and reading individuals
-#
-#   Example:
-#     my_domain:MyEnergyConsumption rdfs:subClassOf energy:EnergyConsumption .
+        
 
-energy:EnergyConsumption a owl:Class ;
-    rdfs:label "Energy Consumption" ;
-    rdfs:comment """
-        The measurable quantity of energy drawn from an EnergySource to satisfy
-        an EnergyDemand. The result of exploitation. Domain-specific consumption
-        types are defined as subclasses in extension files:
-          - water:WaterEnergyConsumption  (water_energy.ttl)
-          - solar:SolarEnergyConsumption  (solar_energy.ttl)
-    """ .
+    # -------------------------------------------------------------------------
+    # SMART SUBCLASSES — equivalentClass axioms enable automatic classification
+    # -------------------------------------------------------------------------
+    energy:ElectricalEnergyConsumption a owl:Class ;
+        rdfs:subClassOf energy:EnergyConsumption ;
+        owl:equivalentClass [
+            rdf:type owl:Class ;
+            owl:intersectionOf (
+                energy:EnergyConsumption
+                [ a owl:Restriction ;
+                  owl:onProperty energy:hasEnergyCarrierType ;
+                  owl:hasValue energy:Electrical ]
+            )
+        ] ;
+        rdfs:label "Electrical Energy Consumption" ;
+        rdfs:comment "Consumption in the form of electricity. Unit: kWh. Automatically classified by a reasoner for any EnergyConsumption individual whose hasEnergyCarrierType is energy:Electrical." .
 
-energy:ElectricalEnergyConsumption a owl:Class ;
-    rdfs:subClassOf energy:EnergyConsumption ;
-    rdfs:label "Electrical Energy Consumption" ;
-    rdfs:comment "Consumption in the form of electricity. Unit: kWh." .
+    energy:ThermalEnergyConsumption a owl:Class ;
+        rdfs:subClassOf energy:EnergyConsumption ;
+        owl:equivalentClass [
+            rdf:type owl:Class ;
+            owl:intersectionOf (
+                energy:EnergyConsumption
+                [ a owl:Restriction ;
+                  owl:onProperty energy:hasEnergyCarrierType ;
+                  owl:hasValue energy:Thermal ]
+            )
+        ] ;
+        rdfs:label "Thermal Energy Consumption" ;
+        rdfs:comment "Consumption in the form of heat. Unit: kWh thermal or MJ. Automatically classified by a reasoner for any EnergyConsumption individual whose hasEnergyCarrierType is energy:Thermal." .
 
-energy:ThermalEnergyConsumption a owl:Class ;
-    rdfs:subClassOf energy:EnergyConsumption ;
-    rdfs:label "Thermal Energy Consumption" ;
-    rdfs:comment "Consumption in the form of heat. Unit: kWh thermal or MJ." .
+    # --- Properties on EnergyConsumption ---
 
-# --- Properties on EnergyConsumption ---
+    energy:hasConsumptionValue a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range qudt:QuantityValue ;
+        rdfs:label "has consumption value" ;
+        rdfs:comment "The total energy consumed over a period (kWh or MJ)." .
 
-energy:hasConsumptionValue a owl:ObjectProperty ;
-    rdfs:domain energy:EnergyConsumption ;
-    rdfs:range qudt:QuantityValue ;
-    rdfs:label "has consumption value" ;
-    rdfs:comment "The total energy consumed over a period (kWh or MJ)." .
+    energy:hasConsumptionRate a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range qudt:QuantityValue ;
+        rdfs:label "has consumption rate" ;
+        rdfs:comment "Energy consumed per unit of output (kWh/m³ for water processes, kW instantaneous for power readings)." .
 
-energy:hasConsumptionRate a owl:ObjectProperty ;
-    rdfs:domain energy:EnergyConsumption ;
-    rdfs:range qudt:QuantityValue ;
-    rdfs:label "has consumption rate" ;
-    rdfs:comment "Energy consumed per unit of output (kWh/m³ for water processes, kW instantaneous for power readings)." .
+    # hasEnergyCarrierType is the consumption-side mirror of energy:hasEnergyCarrier
+    # on EnergySource. Declared as an ObjectProperty (range: energy:EnergyCarrier)
+    # so that owl:equivalentClass restrictions on the subclasses below can reference
+    # the same named individuals (energy:Electrical, energy:Thermal, etc.) and
+    # a reasoner can perform type inference automatically.
+    energy:hasEnergyCarrierType a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergyCarrier ;
+        rdfs:label "has energy carrier type" ;
+        rdfs:comment "The carrier form of the consumed energy (same vocabulary as energy:hasEnergyCarrier). Electrical, Thermal, or Chemical." .
 
-energy:hasEnergyCarrierType a owl:DatatypeProperty ;
-    rdfs:domain energy:EnergyConsumption ;
-    rdfs:range xsd:string ;
-    rdfs:label "has energy carrier type" ;
-    rdfs:comment "Mirrors the carrier of the source: Electrical, Thermal, or Chemical." .
+    energy:causedByDemand a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergyDemand ;
+        rdfs:label "caused by demand" ;
+        rdfs:comment "Inverse of energy:resultsIn. Links consumption back to the demand that caused it." .
 
-energy:causedByDemand a owl:ObjectProperty ;
-    rdfs:domain energy:EnergyConsumption ;
-    rdfs:range energy:EnergyDemand ;
-    rdfs:label "caused by demand" ;
-    rdfs:comment "Inverse of energy:resultsIn. Links consumption back to the demand that caused it." .
-
-energy:drawnFromSource a owl:ObjectProperty ;
-    rdfs:domain energy:EnergyConsumption ;
-    rdfs:range energy:EnergySource ;
-    rdfs:label "drawn from source" ;
-    rdfs:comment "Links a consumption event to the EnergySource it drew from." .
+    energy:drawnFromSource a owl:ObjectProperty ;
+        rdfs:domain energy:EnergyConsumption ;
+        rdfs:range energy:EnergySource ;
+        rdfs:label "drawn from source" ;
+        rdfs:comment "Links a consumption event to the EnergySource it drew from." .
 
 # --- Reading link (for hourly/timestamped instance data) ---
 
@@ -320,26 +366,30 @@ energy:isReadingOf a owl:ObjectProperty ;
     """ .
 
 # --- Measurement type (measured directly vs derived from inputs) ---
-
-energy:isMeasurementType a owl:DatatypeProperty ;
-    rdfs:label "is measurement type" ;
+energy:MeasurementType a owl:Class ;
+    rdfs:label "Measurement Type" ;
     rdfs:comment """
         Distinguishes how a reading value was obtained:
           'Measured'  — directly observed by a sensor (e.g. Solar_PowerMeter, MBR_PowerMeter)
           'Derived'   — computed from other measured inputs
                         (e.g. Grid power = MBR power + RO power - Solar power;
-                              MBR power  = ratedPower × BlowerLoad fraction;
-                              RO power   = specificEnergy × FeedFlow)
+                              MBR power  = ratedPower x BlowerLoad fraction;
+                              RO power   = specificEnergy x FeedFlow)
         SPARQL queries use this flag to decide whether to read a value directly
         or compute it from its inputs.
-    """ ;
-    rdfs:range xsd:string .
+    """ .
+    energy:Measured a owl:MeasurementType ;
+    rdfs:label "Measured" ;
+    rdfs:comment "A measurement that was directly observed by a sensor." .
+    energy:Derived a owl:MeasurementType ;
+    rdfs:label "Derived" ;
+    rdfs:comment "A measurement that was computed from other measured inputs." .
 
-# --- Inverse declaration ---
-
-owl:inverseOf a owl:ObjectProperty .
-energy:resultsIn owl:inverseOf energy:causedByDemand .
-
+energy:isMeasurementType a owl:ObjectProperty ;
+    rdfs:domain qudt:QuantityValue ;
+    rdfs:range energy:MeasurementType ;
+    rdfs:label "is measurement type" ;
+    rdfs:comment "Indicates whether a reading value was directly measured or derived from other inputs." .
 
 # =============================================================================
 # OBSERVABLE PROPERTIES (general — extended by domain files)
@@ -347,10 +397,14 @@ energy:resultsIn owl:inverseOf energy:causedByDemand .
 # Named individuals for sosa:observedProperty links in instance data.
 # Domain extension files add further observable property individuals.
 
-energy:ElectricalPower a owl:NamedIndividual ;
+energy:ObservableProperty a owl:Class ;
+    rdfs:label "Observable Property" ;
+    rdfs:comment "A measurable physical quantity observed by a sensor. Open class — domain extension files add further individuals." .
+
+energy:ElectricalPower a owl:NamedIndividual, energy:ObservableProperty ;
     rdfs:label "Electrical Power" ;
     rdfs:comment "Observable property: instantaneous electrical power (kW). Used by PowerMeter sensors." .
 
-energy:LoadFraction a owl:NamedIndividual ;
+energy:LoadFraction a owl:NamedIndividual, energy:ObservableProperty ;
     rdfs:label "Load Fraction" ;
     rdfs:comment "Observable property: dimensionless operating load fraction (0–1). Used by LoadSensor sensors." .

@@ -1,4 +1,4 @@
-@prefix case:         <https://w3id.org/waterframe/case/household/> .
+@prefix case:         <https://ugentbiomath.github.io/ontology/household_energy_timeseries.ttl>.
 @prefix wf:           <https://ugentbiomath.github.io/waterframe#> .
 @prefix energy:       <https://ugentbiomath.github.io/ontology/energy.ttl#> .
 @prefix qudt:         <http://qudt.org/schema/qudt/> .
@@ -6,6 +6,7 @@
 @prefix sosa:         <http://www.w3.org/ns/sosa/> .
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix dcterms:      <http://purl.org/dc/terms/> .
 
 case:Electricity_Grid a wf:ExternalAgent, energy:EnergySystemComponent ;

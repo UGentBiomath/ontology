@@ -1,0 +1,687 @@
+@prefix case:         <https://w3id.org/waterframe/case/household/> .
+@prefix wf:           <https://ugentbiomath.github.io/waterframe#> .
+@prefix energy:       <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix qudt:         <http://qudt.org/schema/qudt/> .
+@prefix unit:         <http://qudt.org/vocab/unit/> .
+@prefix sosa:         <http://www.w3.org/ns/sosa/> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms:      <http://purl.org/dc/terms/> .
+
+case:Electricity_Grid a wf:ExternalAgent, energy:EnergySystemComponent ;
+    rdfs:label "Electricity Grid" ;
+    rdfs:comment """External electricity grid supplying the household treatment system.
+    Modelled as a wf:ExternalAgent so it is substitutable in optimisation scenarios
+    (e.g. compare grid-fed vs solar-only vs battery configurations). The grid supplies
+    whatever power the on-site solar PV does not cover.""" ;
+    wf:hasOutputPort case:Grid_Supply_Out .
+
+# --- Rooftop Solar PV Array ---
+case:Solar_PV_Array a energy:SolarPVSystem ;
+    rdfs:label "Rooftop Solar PV Array" ;
+    rdfs:comment "3 kWp rooftop photovoltaic system. Covers part of the household treatment demand during daylight; surplus is exported to the grid." ;
+    wf:hasOutputPort case:Solar_Power_Out .
+
+# --- Household Electrical Panel ---
+# Central distribution node that aggregates grid and solar inputs
+# and distributes electricity to the treatment units.
+case:Household_Electrical_Panel a energy:ElectricalPanel ;
+    rdfs:label "Household Electrical Panel" ;
+    rdfs:comment "Main distribution board aggregating grid import and solar generation, feeding the MBR and RO treatment units." ;
+    wf:hasInputPort  case:HEP_Grid_In ;
+    wf:hasInputPort  case:HEP_Solar_In ;
+    wf:hasOutputPort case:HEP_MBR_Out ;
+    wf:hasOutputPort case:HEP_RO_Out .
+
+
+# ====================================================================================
+# 2.  Electrical Ports and Flow Connections
+# ====================================================================================
+# All ports carry wf:ElectricalFlow (defined in core/properties.ttl).
+# Naming follows the same convention as water ports in household_case1.ttl.
+
+case:Grid_Supply_Out a wf:OutputPort ;
+    rdfs:label "Grid Electrical Supply Outlet" ;
+    wf:hasFlowType wf:ElectricalFlow ;
+    wf:flowsTo case:HEP_Grid_In .
+
+case:Solar_Power_Out a wf:OutputPort ;
+    rdfs:label "Solar PV Power Outlet" ;
+    wf:hasFlowType wf:ElectricalFlow ;
+    wf:flowsTo case:HEP_Solar_In .
+
+case:HEP_Grid_In a wf:InputPort ;
+    rdfs:label "Panel Grid Import Inlet" ;
+    wf:hasFlowType wf:ElectricalFlow .
+
+case:HEP_Solar_In a wf:InputPort ;
+    rdfs:label "Panel Solar Import Inlet" ;
+    wf:hasFlowType wf:ElectricalFlow .
+
+case:HEP_MBR_Out a wf:OutputPort ;
+    rdfs:label "Panel MBR Supply Outlet" ;
+    wf:hasFlowType wf:ElectricalFlow ;
+    wf:flowsTo case:MBR_ElectricalIn .
+
+case:HEP_RO_Out a wf:OutputPort ;
+    rdfs:label "Panel RO Supply Outlet" ;
+    wf:hasFlowType wf:ElectricalFlow ;
+    wf:flowsTo case:RO_ElectricalIn .
+
+# Electrical input ports added to existing treatment units
+case:MBR_ElectricalIn a wf:InputPort ;
+    rdfs:label "MBR Electrical Supply Inlet" ;
+    wf:hasFlowType wf:ElectricalFlow .
+
+case:RO_ElectricalIn a wf:InputPort ;
+    rdfs:label "RO Electrical Supply Inlet" ;
+    wf:hasFlowType wf:ElectricalFlow .
+
+# Attach electrical ports to existing treatment units from household_case1.ttl
+case:Membrane_bioreactor wf:hasInputPort case:MBR_ElectricalIn .
+case:Reverse_osmosis     wf:hasInputPort case:RO_ElectricalIn .
+
+
+
+
+case:MBR_BlowerRatedPower a qudt:QuantityValue ;
+    qudt:numericValue "1.6"^^xsd:decimal ;
+    qudt:unit unit:KiloWatt ;
+    rdfs:label "MBR Aeration Blower Rated Power (1.6 kW)" .
+
+case:RO_PumpSpecificEnergy a qudt:QuantityValue ;
+    qudt:numericValue "3.0"^^xsd:decimal ;
+    qudt:unit unit:KiloWattHourPerCubicMeter ;
+    rdfs:label "RO High-Pressure Pump Specific Energy (3.0 kWh/m³)" .
+
+
+case:MBR_AerationBlower a energy:AerationBlower ;
+    rdfs:label "MBR Aeration Blower" ;
+    rdfs:comment """Rotary lobe blower providing air for biological treatment and
+    membrane scouring in the MBR. Rated at 1.6 kW; actual draw varies with
+    mixed-liquor demand and DO set-point.""" ;
+    energy:ratedPower case:MBR_BlowerRatedPower ;
+    wf:isSubComponentOf case:Membrane_bioreactor .
+
+case:RO_HighPressurePump a energy:HighPressurePump ;
+    rdfs:label "RO High-Pressure Pump" ;
+    rdfs:comment """High-pressure feed pump for the reverse osmosis unit. Specific
+    energy consumption is 3.0 kWh per m³ of feed water processed. Pump runs
+    only when the RO unit is active.""" ;
+    energy:specificEnergy case:RO_PumpSpecificEnergy ;
+    wf:isSubComponentOf case:Reverse_osmosis .
+
+case:Membrane_bioreactor wf:hasSubComponent case:MBR_AerationBlower .
+case:Reverse_osmosis     wf:hasSubComponent case:RO_HighPressurePump .
+
+
+# ====================================================================================
+# 4.  Sensors
+# ====================================================================================
+# Sensor → port and sensor → component links follow the SOSA alignment pattern
+# established in data/ontology/modules/bridges/sosa_alignment.ttl:
+#   wf:monitorsPort   (sensor → port it monitors)
+#   wf:attachedTo     (sensor → component it is physically attached to)
+#   sosa:observes     (sensor → observable property class)
+
+# --- Power meters (direct electrical measurements) ---
+
+case:Grid_PowerMeter a energy:PowerMeter, sosa:Sensor ;
+    rdfs:label "Grid Import Power Meter" ;
+    rdfs:comment "Measures instantaneous electrical power drawn from the grid. Zero when solar fully covers demand." ;
+    sosa:observes    energy:ElectricalPower ;
+    wf:monitorsPort  case:Grid_Supply_Out ;
+    wf:attachedTo    case:Electricity_Grid .
+
+case:Solar_PowerMeter a energy:PowerMeter, sosa:Sensor ;
+    rdfs:label "Solar PV Output Power Meter" ;
+    rdfs:comment "Measures instantaneous electrical power produced by the rooftop PV array." ;
+    sosa:observes    energy:ElectricalPower ;
+    wf:monitorsPort  case:Solar_Power_Out ;
+    wf:attachedTo    case:Solar_PV_Array .
+
+case:MBR_PowerMeter a energy:PowerMeter, sosa:Sensor ;
+    rdfs:label "MBR Power Meter" ;
+    rdfs:comment "Measures total instantaneous power consumed by the MBR unit (blower + ancillaries). Ground-truth for CQ-E3 and Pattern-1 verification." ;
+    sosa:observes    energy:ElectricalPower ;
+    wf:monitorsPort  case:MBR_ElectricalIn ;
+    wf:attachedTo    case:Membrane_bioreactor .
+
+case:RO_PowerMeter a energy:PowerMeter, sosa:Sensor ;
+    rdfs:label "RO Power Meter" ;
+    rdfs:comment "Measures total instantaneous power consumed by the RO unit (pump + controls). Ground-truth for Pattern-2 verification." ;
+    sosa:observes    energy:ElectricalPower ;
+    wf:monitorsPort  case:RO_ElectricalIn ;
+    wf:attachedTo    case:Reverse_osmosis .
+
+# --- Derivation input sensors ---
+
+case:MBR_BlowerLoad a energy:LoadSensor, sosa:Sensor ;
+    rdfs:label "MBR Blower Load Sensor" ;
+    rdfs:comment """Measures the operating load fraction of the MBR aeration blower
+    (0 = off, 1 = full rated power). Multiply by energy:ratedPower of
+    case:MBR_AerationBlower to derive instantaneous power draw (Pattern 1).""" ;
+    sosa:observes  energy:LoadFraction ;
+    wf:attachedTo  case:MBR_AerationBlower .
+
+case:RO_FeedFlow a wf:FlowSensor, sosa:Sensor ;
+    rdfs:label "RO Feed Flow Sensor" ;
+    rdfs:comment """Measures volumetric flow rate of water entering the RO unit (m³/h).
+    Multiply by energy:specificEnergy of case:RO_HighPressurePump to derive
+    instantaneous pump power (Pattern 2).""" ;
+    sosa:observes   wf:FlowRate ;
+    wf:monitorsPort case:RO_In ;
+    wf:attachedTo   case:Reverse_osmosis .
+
+
+# ====================================================================================
+# 5.  Time-Series Observations  —  2024-01-15  (24 hourly readings per sensor)
+# ====================================================================================
+# All resultTime values are the START of the one-hour interval.
+# hasSimpleResult units:
+#   Grid_PowerMeter, Solar_PowerMeter, MBR_PowerMeter, RO_PowerMeter : kW (student assigns)
+#   MBR_BlowerLoad  : dimensionless fraction (student assigns)
+#   RO_FeedFlow     : m³/h (student assigns)
+#
+# Derivation consistency checks built into the data:
+#   MBR power  = MBR_AerationBlower.ratedPower (1.6 kW) × MBR_BlowerLoad value
+#   RO power   = RO_HighPressurePump.specificEnergy (3.0 kWh/m³) × RO_FeedFlow value
+#   Grid power = MAX(0,  MBR power + RO power − Solar power)
+
+
+# ── 5a. Grid Import Power Meter ──────────────────────────────────────────────────────
+
+case:Grid_Obs_T00 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.82"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:Grid_Obs_T01 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.80"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:Grid_Obs_T02 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.78"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:Grid_Obs_T03 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.79"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:Grid_Obs_T04 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.80"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:Grid_Obs_T05 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.85"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:Grid_Obs_T06 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.38"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:Grid_Obs_T07 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.55"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:Grid_Obs_T08 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.29"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:Grid_Obs_T09 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.65"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:Grid_Obs_T10 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:Grid_Obs_T11 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:Grid_Obs_T12 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:Grid_Obs_T13 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:Grid_Obs_T14 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:Grid_Obs_T15 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:Grid_Obs_T16 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.55"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:Grid_Obs_T17 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.32"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:Grid_Obs_T18 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.70"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:Grid_Obs_T19 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.72"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:Grid_Obs_T20 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.62"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:Grid_Obs_T21 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.20"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:Grid_Obs_T22 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.05"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:Grid_Obs_T23 a sosa:Observation ; sosa:madeBySensor case:Grid_PowerMeter ;
+    sosa:featureOfInterest case:Electricity_Grid ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.90"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# ── 5b. Solar PV Output Power Meter ──────────────────────────────────────────────────
+
+case:Solar_Obs_T00 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:Solar_Obs_T01 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:Solar_Obs_T02 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:Solar_Obs_T03 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:Solar_Obs_T04 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:Solar_Obs_T05 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:Solar_Obs_T06 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:Solar_Obs_T07 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.12"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:Solar_Obs_T08 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.45"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:Solar_Obs_T09 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.95"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:Solar_Obs_T10 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.42"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:Solar_Obs_T11 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.78"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:Solar_Obs_T12 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.92"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:Solar_Obs_T13 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.85"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:Solar_Obs_T14 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.55"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:Solar_Obs_T15 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.08"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:Solar_Obs_T16 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.58"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:Solar_Obs_T17 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.15"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:Solar_Obs_T18 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:Solar_Obs_T19 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:Solar_Obs_T20 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:Solar_Obs_T21 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:Solar_Obs_T22 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:Solar_Obs_T23 a sosa:Observation ; sosa:madeBySensor case:Solar_PowerMeter ;
+    sosa:featureOfInterest case:Solar_PV_Array ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# ── 5c. MBR Power Meter  (ground-truth for Pattern 1) ────────────────────────────────
+# Values = MBR_AerationBlower.ratedPower (1.6 kW) × MBR_BlowerLoad fraction
+
+case:MBR_Obs_T00 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.82"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:MBR_Obs_T01 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.80"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:MBR_Obs_T02 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.78"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:MBR_Obs_T03 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.79"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:MBR_Obs_T04 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.80"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:MBR_Obs_T05 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.85"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:MBR_Obs_T06 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.20"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:MBR_Obs_T07 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.45"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:MBR_Obs_T08 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.52"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:MBR_Obs_T09 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.38"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:MBR_Obs_T10 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.15"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:MBR_Obs_T11 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.05"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:MBR_Obs_T12 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.98"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:MBR_Obs_T13 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.95"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:MBR_Obs_T14 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.92"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:MBR_Obs_T15 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.90"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:MBR_Obs_T16 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.95"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:MBR_Obs_T17 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.25"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:MBR_Obs_T18 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.48"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:MBR_Obs_T19 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.50"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:MBR_Obs_T20 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.42"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:MBR_Obs_T21 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.20"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:MBR_Obs_T22 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "1.05"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:MBR_Obs_T23 a sosa:Observation ; sosa:madeBySensor case:MBR_PowerMeter ;
+    sosa:featureOfInterest case:Membrane_bioreactor ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.90"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# ── 5d. RO Power Meter  (ground-truth for Pattern 2) ─────────────────────────────────
+# Values = RO_HighPressurePump.specificEnergy (3.0 kWh/m³) × RO_FeedFlow value
+
+case:RO_Obs_T00 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:RO_Obs_T01 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:RO_Obs_T02 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:RO_Obs_T03 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:RO_Obs_T04 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:RO_Obs_T05 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:RO_Obs_T06 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.18"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:RO_Obs_T07 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:RO_Obs_T08 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:RO_Obs_T09 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:RO_Obs_T10 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.18"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:RO_Obs_T11 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:RO_Obs_T12 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:RO_Obs_T13 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:RO_Obs_T14 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:RO_Obs_T15 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:RO_Obs_T16 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.18"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:RO_Obs_T17 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:RO_Obs_T18 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:RO_Obs_T19 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.22"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:RO_Obs_T20 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.20"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:RO_Obs_T21 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:RO_Obs_T22 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:RO_Obs_T23 a sosa:Observation ; sosa:madeBySensor case:RO_PowerMeter ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty energy:ElectricalPower ;
+    sosa:hasSimpleResult "0.00"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# ── 5e. MBR Blower Load Sensor  (Pattern 1 input) ────────────────────────────────────
+# load_fraction = MBR_PowerMeter value ÷ ratedPower (1.6 kW)
+# Verify: load_fraction × 1.6 kW = MBR_PowerMeter value
+
+case:BlowerLoad_T00 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5125"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:BlowerLoad_T01 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5000"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:BlowerLoad_T02 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.4875"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:BlowerLoad_T03 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.4938"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:BlowerLoad_T04 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5000"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:BlowerLoad_T05 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5313"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:BlowerLoad_T06 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.7500"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:BlowerLoad_T07 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.9063"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:BlowerLoad_T08 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.9500"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:BlowerLoad_T09 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.8625"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:BlowerLoad_T10 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.7188"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:BlowerLoad_T11 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.6563"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:BlowerLoad_T12 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.6125"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:BlowerLoad_T13 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5938"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:BlowerLoad_T14 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5750"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:BlowerLoad_T15 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5625"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:BlowerLoad_T16 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5938"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:BlowerLoad_T17 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.7813"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:BlowerLoad_T18 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.9250"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:BlowerLoad_T19 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.9375"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:BlowerLoad_T20 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.8875"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:BlowerLoad_T21 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.7500"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:BlowerLoad_T22 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.6563"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:BlowerLoad_T23 a sosa:Observation ; sosa:madeBySensor case:MBR_BlowerLoad ;
+    sosa:featureOfInterest case:MBR_AerationBlower ; sosa:observedProperty energy:LoadFraction ;
+    sosa:hasSimpleResult "0.5625"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# ── 5f. RO Feed Flow Sensor  (Pattern 2 input) ───────────────────────────────────────
+# flow_rate (m³/h) = RO_PowerMeter value ÷ specificEnergy (3.0 kWh/m³)
+# Verify: flow_rate × 3.0 kWh/m³ = RO_PowerMeter value
+
+case:ROFlow_T00 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T00:00:00"^^xsd:dateTime .
+case:ROFlow_T01 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T01:00:00"^^xsd:dateTime .
+case:ROFlow_T02 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T02:00:00"^^xsd:dateTime .
+case:ROFlow_T03 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T03:00:00"^^xsd:dateTime .
+case:ROFlow_T04 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T04:00:00"^^xsd:dateTime .
+case:ROFlow_T05 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T05:00:00"^^xsd:dateTime .
+case:ROFlow_T06 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.060"^^xsd:decimal ; sosa:resultTime "2024-01-15T06:00:00"^^xsd:dateTime .
+case:ROFlow_T07 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T07:00:00"^^xsd:dateTime .
+case:ROFlow_T08 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T08:00:00"^^xsd:dateTime .
+case:ROFlow_T09 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T09:00:00"^^xsd:dateTime .
+case:ROFlow_T10 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.060"^^xsd:decimal ; sosa:resultTime "2024-01-15T10:00:00"^^xsd:dateTime .
+case:ROFlow_T11 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T11:00:00"^^xsd:dateTime .
+case:ROFlow_T12 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T12:00:00"^^xsd:dateTime .
+case:ROFlow_T13 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T13:00:00"^^xsd:dateTime .
+case:ROFlow_T14 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T14:00:00"^^xsd:dateTime .
+case:ROFlow_T15 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T15:00:00"^^xsd:dateTime .
+case:ROFlow_T16 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.060"^^xsd:decimal ; sosa:resultTime "2024-01-15T16:00:00"^^xsd:dateTime .
+case:ROFlow_T17 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T17:00:00"^^xsd:dateTime .
+case:ROFlow_T18 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T18:00:00"^^xsd:dateTime .
+case:ROFlow_T19 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.073"^^xsd:decimal ; sosa:resultTime "2024-01-15T19:00:00"^^xsd:dateTime .
+case:ROFlow_T20 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.067"^^xsd:decimal ; sosa:resultTime "2024-01-15T20:00:00"^^xsd:dateTime .
+case:ROFlow_T21 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T21:00:00"^^xsd:dateTime .
+case:ROFlow_T22 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T22:00:00"^^xsd:dateTime .
+case:ROFlow_T23 a sosa:Observation ; sosa:madeBySensor case:RO_FeedFlow ;
+    sosa:featureOfInterest case:Reverse_osmosis ; sosa:observedProperty wf:FlowRate ;
+    sosa:hasSimpleResult "0.000"^^xsd:decimal ; sosa:resultTime "2024-01-15T23:00:00"^^xsd:dateTime .
+
+
+# =============================================================================
+# ONTOLOGY IMPORTS & ALIGNMENT (appended to household_case.ttl)
+# =============================================================================
+# Make this file self‑contained: import the three domain ontologies.
+<https://w3id.org/waterframe/case/household/>
+    a owl:Ontology ;
+    owl:imports <https://ugentbiomath.github.io/ontology/energy.ttl> ,
+                <https://ugentbiomath.github.io/ontology/water_energy.ttl> ,
+                <https://ugentbiomath.github.io/ontology/solar_energy.ttl> .
+
+# --- Class assertions ---
+case:Membrane_bioreactor a water:MembraneBioReactor .
+case:Reverse_osmosis     a water:SeaWaterReverseOsmosis .
+case:Electricity_Grid    a solar:GridConnection .
+case:Solar_PV_Array      a solar:SolarPVSystem .
+case:Household_Electrical_Panel a solar:ElectricalPanel .
+case:MBR_AerationBlower  a solar:AerationBlower .
+case:RO_HighPressurePump a solar:HighPressurePump .
+
+# --- Link each power‑meter observation to the water process ---
+# MBR Power Meter observations → Membrane_bioreactor
+[ water:hasElectricalEnergyConsumption [
+    a qudt:QuantityValue ;
+    qudt:numericValue "0.82"^^xsd:decimal ;
+    qudt:unit unit:KiloWatt ;
+    qudt:quantityValueDate "2024-01-15T00:00:00"^^xsd:dateTime ;
+    energy:isMeasurementType energy:Measured
+] ] ;
+# … repeat for all 24 MBR_Obs_Txx values …
+# I will give you a SPARQL pattern to generate this whole block automatically.
+
+# RO Power Meter observations → Reverse_osmosis
+# Grid Power Meter observations → Electricity_Grid (use energy:hasEnergyReading)
+# Solar Power Meter observations → Solar_PV_Array (use energy:hasEnergyReading)

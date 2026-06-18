@@ -1,4 +1,6 @@
-@prefix case:         <https://ugentbiomath.github.io/ontology/household_energy_timeseries.ttl>.
+@prefix case:         <https://ugentbiomath.github.io/ontology/household_energy_timeseries.ttl#> .
+@prefix water:        <https://ugentbiomath.github.io/ontology/water_energy.ttl#> .
+@prefix solar:   <https://ugentbiomath.github.io/ontology/solar_energy.ttl#> .
 @prefix wf:           <https://ugentbiomath.github.io/waterframe#> .
 @prefix energy:       <https://ugentbiomath.github.io/ontology/energy.ttl#> .
 @prefix qudt:         <http://qudt.org/schema/qudt/> .
@@ -679,7 +681,7 @@ case:RO_HighPressurePump a solar:HighPressurePump .
     qudt:unit unit:KiloWatt ;
     qudt:quantityValueDate "2024-01-15T00:00:00"^^xsd:dateTime ;
     energy:isMeasurementType energy:Measured
-] ] ;
+] ] .
 # … repeat for all 24 MBR_Obs_Txx values …
 # I will give you a SPARQL pattern to generate this whole block automatically.
 

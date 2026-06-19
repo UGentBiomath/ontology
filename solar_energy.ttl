@@ -1,5 +1,6 @@
-     .
+@prefix solar:   <https://ugentbiomath.github.io/ontology/solar_energy.ttl#> .
 @prefix energy:  <https://ugentbiomath.github.io/ontology/energy.ttl#> .
+@prefix case:       <https://ugentbiomath.github.io/ontology/household_energy_timeseries.ttl#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
@@ -317,3 +318,58 @@ solar:Reading_ROFeedFlow_Std a qudt:QuantityValue ;
     qudt:unit unit:CubicMeterPerHour ;
     rdfs:label "Standard RO Feed Flow Reading" ;
     rdfs:comment "Anchor reading for RO feed water flow rate (m³/h, hourly). Measured by RO_FeedFlow sensor." .
+
+# ─── EnergySource instances (typed via solar subclasses) ──────────────────────
+
+case:Solar_PV_Array a solar:SolarPVSystem ;
+    rdfs:label "Solar PV Array" .
+
+case:Electricity_Grid a solar:GridConnection ;
+    rdfs:label "Electricity Grid" .
+
+# ─── EnergyDemand instances ───────────────────────────────────────────────────
+
+case:Demand_MBR a energy:EnergyDemand ;
+    rdfs:label "MBR Aeration Demand" ;
+    energy:hasDemandType      energy:Mechanical ;
+    energy:hasDemandMagnitude [ a qudt:QuantityValue ;
+      qudt:numericValue 26.09 ;
+   qudt:unit unit:KiloWattHour ] ;
+    energy:hasDemandFrequency energy:Continuous ;
+    energy:isMetBy            case:Solar_PV_Array ;
+    energy:isMetBy            case:Electricity_Grid .
+
+case:Demand_RO a energy:EnergyDemand ;
+    rdfs:label "RO Pump Demand" ;
+    energy:hasDemandType      energy:Mechanical ;
+    energy:hasDemandMagnitude 
+    [ a qudt:QuantityValue ;
+     qudt:numericValue 2.06 ;
+   qudt:unit unit:KiloWattHour ] ;
+    energy:hasDemandFrequency energy:Batch ;
+    energy:isMetBy            case:Solar_PV_Array ;
+    energy:isMetBy            case:Electricity_Grid .
+
+# ─── EnergyConsumption instances (typed via solar subclass) ───────────────────
+
+case:Consumption_MBR a solar:SolarEnergyConsumption ;
+    rdfs:label "MBR Solar Energy Consumption" ;
+    energy:causedByDemand    case:Demand_MBR ;
+    energy:drawnFrom         case:Solar_PV_Array ;
+    energy:hasConsumptionValue [ a qudt:QuantityValue ;
+    qudt:numericValue 26.09 ;
+    qudt:unit unit:KiloWattHour ] ;
+    energy:hasConsumptionRate  [ a qudt:QuantityValue ;
+    qudt:numericValue 1.09 ;
+    qudt:unit unit:KiloWatt ] .
+
+case:Consumption_RO a solar:SolarEnergyConsumption ;
+    rdfs:label "RO Solar Energy Consumption" ;
+    energy:causedByDemand    case:Demand_RO ;
+    energy:drawnFrom         case:Electricity_Grid ;
+    energy:hasConsumptionValue [ a qudt:QuantityValue ;
+    qudt:numericValue 2.06 ;
+    qudt:unit unit:KiloWattHour ] ;
+    energy:hasConsumptionRate  [ a qudt:QuantityValue ;
+                                 qudt:numericValue 0.21 ;
+                                qudt:unit unit:KiloWatt ] .

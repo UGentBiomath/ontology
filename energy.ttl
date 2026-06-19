@@ -359,3 +359,4 @@ energy:ElectricalPower a owl:NamedIndividual, energy:ObservableProperty ;
 energy:LoadFraction a owl:NamedIndividual, energy:ObservableProperty ;
     rdfs:label "Load Fraction" ;
     rdfs:comment "Observable property: dimensionless operating load fraction (0–1). Used by LoadSensor sensors." .
+
